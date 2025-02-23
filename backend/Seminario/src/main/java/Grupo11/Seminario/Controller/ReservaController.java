@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -181,5 +182,16 @@ public class ReservaController {
         }
         response.put("message", "No se encontro al usuario");
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @GetMapping(path = "/reservas/filtrar")
+    public ResponseEntity<List<Reserva>> obtenerReservasFiltradas(
+        @RequestParam(required = false) String email,
+        @RequestParam(required = false) String nombre,
+        @RequestParam(required = false) String apellido,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+
+        List<Reserva> reservas = reserva_service.buscarReservas(email, nombre, apellido, fecha);
+        return ResponseEntity.ok(reservas);
     }
 }
