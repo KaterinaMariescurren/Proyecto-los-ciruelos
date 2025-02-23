@@ -72,3 +72,78 @@
     display: flex;
     gap: 20px;
 }
+
+/* ==================== SIDEBAR PARA ADMIN ==================== */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: #f8f9fa;
+    padding: 20px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.sidebar-logo {
+    width: 50px;
+    height: 50px;
+    background-image: url('../../assets/images/Logo_Los_Ciruelos_Padel-removebg-preview.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.sidebar-close {
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+.sidebar-close:hover {
+    background-color: #d32f2f;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.sidebar-menu li {
+    margin-bottom: 15px;
+}
+
+.sidebar-menu button {
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+    color: #333;
+    transition: background 0.3s ease, transform 0.2s ease;
+    border-radius: 5px;
+}
+
+.sidebar-menu button:hover {
+    background: #ddd;
+    transform: translateX(5px);
+}

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { ConfiguracionService } from '../../../services/configuracion-general.service';
+import { ConfiguracionGeneral, ConfiguracionService } from '../../../services/configuracion-general.service';
 import { ApiService } from '../../../api.service';
 
 @Component({
@@ -11,7 +11,17 @@ import { ApiService } from '../../../api.service';
 })
 export class ModificarValoresComponent implements OnInit {
   form!: FormGroup;
-  configuracion: any = null;
+  configuracion: ConfiguracionGeneral | null = null;
+
+  monto_reserva = 0;
+  monto_asociacion = 0;
+  porcentaje_senia = 0;
+  descuento_socio = 0;
+  monto_paletas = 0;
+  monto_pelotas = 0;
+  stock_paletas = 0;
+  stock_pelotas = 0;
+  duracion_maxima_turno = 0;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -22,14 +32,15 @@ export class ModificarValoresComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
-      precioCancha1: [0, [Validators.required, Validators.min(0)]],
-      precioCancha2: [0, [Validators.required, Validators.min(0)]],
-      precioCancha3: [0, [Validators.required, Validators.min(0)]],
-      precioCancha4: [0, [Validators.required, Validators.min(0)]],
-      precioPelota: [0, [Validators.required, Validators.min(0)]],
-      precioPaleta: [0, [Validators.required, Validators.min(0)]],
-      stockPelotas: [0, [Validators.required, Validators.min(0)]],
-      stockPaletas: [0, [Validators.required, Validators.min(0)]],
+      monto_reserva: [0, [Validators.required, Validators.min(0)]],
+      monto_asociacion: [0, [Validators.required, Validators.min(0)]],
+      porcentaje_senia: [0, [Validators.required, Validators.min(0)]],
+      descuento_socio: [0, [Validators.required, Validators.min(0)]],
+      monto_paletas: [0, [Validators.required, Validators.min(0)]],
+      monto_pelotas: [0, [Validators.required, Validators.min(0)]],
+      stock_paletas: [0, [Validators.required, Validators.min(0)]],
+      stock_pelotas: [0, [Validators.required, Validators.min(0)]],
+      duracion_maxima_turno: [0, [Validators.required, Validators.min(0)]],
     });
 
     this.obtenerConfiguracion();
@@ -37,18 +48,18 @@ export class ModificarValoresComponent implements OnInit {
 
   obtenerConfiguracion(): void {
     this.configuracionService.getConfiguracion().subscribe(config => {
+      this.configuracionService.setConfiguracion(config);
       this.configuracion = config;
 
-      this.form.patchValue({
-        precioCancha1: this.configuracion.precio_cancha_1,
-        precioCancha2: this.configuracion.precio_cancha_2,
-        precioCancha3: this.configuracion.precio_cancha_3,
-        precioCancha4: this.configuracion.precio_cancha_4,
-        precioPelota: this.configuracion.monto_pelotas,
-        precioPaleta: this.configuracion.monto_paletas,
-        stockPelotas: this.configuracion.stock_pelotas,
-        stockPaletas: this.configuracion.stock_paletas,
-      });
+      this.monto_reserva = this.configuracion.monto_reserva ;
+      this.monto_asociacion = this.configuracion.monto_asociacion ;
+      this.porcentaje_senia = this.configuracion.porcentaje_senia ;
+      this.descuento_socio = this.configuracion.descuento_socio ;
+      this.monto_paletas = this.configuracion.monto_paletas ;
+      this.stock_paletas = this.configuracion.stock_paletas ;
+      this.monto_pelotas = this.configuracion.monto_pelotas ;
+      this.stock_pelotas = this.configuracion.stock_pelotas ;
+      this.duracion_maxima_turno = this.configuracion.duracion_maxima_turno ;
     });
   }
 
@@ -61,14 +72,15 @@ export class ModificarValoresComponent implements OnInit {
     const formValues = this.form.value;
 
     const nuevaConfiguracion = {
-      precio_cancha_1: formValues.precioCancha1,
-      precio_cancha_2: formValues.precioCancha2,
-      precio_cancha_3: formValues.precioCancha3,
-      precio_cancha_4: formValues.precioCancha4,
-      monto_pelotas: formValues.precioPelota,
-      monto_paletas: formValues.precioPaleta,
-      stock_pelotas: formValues.stockPelotas,
-      stock_paletas: formValues.stockPaletas
+      monto_reserva: formValues.monto_reserva,
+      monto_asociacion: formValues.monto_asociacion,
+      porcentaje_senia : formValues.porcentaje_senia,
+      descuento_socio : formValues.descuento_socio,
+      monto_paletas : formValues.monto_paletas,
+      monto_pelotas: formValues.monto_pelotas,
+      stock_paletas: formValues.stock_paletas,
+      stock_pelotas: formValues.stock_pelotas,
+      duracion_maxima_turno: formValues.duracion_maxima_turno,
     };
 
     // Enviar al servidor la nueva configuración

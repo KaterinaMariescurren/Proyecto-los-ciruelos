@@ -20,7 +20,7 @@ import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { applyActionCode, getAuth, getRedirectResult, onAuthStateChanged, signInWithRedirect, signOut } from 'firebase/auth';
-import { HttpClient } from '@angular/common/http';  // Importamos HttpClient para las solicitudes HTTP
+import { HttpClient, HttpParams } from '@angular/common/http';  // Importamos HttpClient para las solicitudes HTTP
 
 export interface Credential {
   email: string;
@@ -181,13 +181,14 @@ export class AuthService {
         if (!user) {
           return [null]; // Si no hay usuario, retornamos null
         }
-
+  
         // Llamamos al backend para verificar el rol (empleado o duenio)
-        return this.http.get<{ role: string }>(`/public/verificar/empleado?email=${user.email}`).pipe(
-          map((response) => response.role === 'duenio' ? 'admin' : 'empleado') // "duenio" lo convertimos en "admin"
+        return this.http.get<{ message: string }>(`/public/verificar/empleado?email=${user.email}`).pipe(
+          map((response) => response.message) // Devolvemos el mensaje tal cual (duenio o empleado)
         );
       })
     );
   }
   
+
 }

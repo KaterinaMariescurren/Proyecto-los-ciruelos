@@ -11,15 +11,19 @@ export class ConsultarReservasComponent {
   usuarioActual: any;
   reservas: any[] = [];
   reservasFiltradas: any[] = [];
+  busqueda: string = '';
+
 
   filtro = {
     fecha: '',
     cancha: '',
-    estado: '' 
+    estado: '',
+    horarioInicio: '', 
   };
 
   canchas: string[] = ["Cancha 1", "Cancha 2", "Cancha 3", "Cancha 4"];
   estados: string[] = ["Pendiente", "Confirmada", "Cancelada", "Expirada"];
+  horarios: string[] = ["08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM"];
 
   constructor(
     private authService: AuthService,
@@ -48,10 +52,13 @@ export class ConsultarReservasComponent {
 
   filtrarReservas(): void {
     this.reservasFiltradas = this.reservas.filter(reserva => {
+      if (!reserva || !reserva.turno) return false;
+
       return (
         (!this.filtro.fecha || reserva.turno.fecha === this.filtro.fecha) &&
-        (!this.filtro.cancha || reserva.turno.cancha.numero === this.filtro.cancha) &&
-        (!this.filtro.estado || reserva.estado === this.filtro.estado)
+        (!this.filtro.cancha || reserva.turno.cancha === this.filtro.cancha) &&
+        (!this.filtro.estado || reserva.estado === this.filtro.estado) &&
+        (!this.filtro.horarioInicio || reserva.turno.horarioInicio === this.filtro.horarioInicio)
       );
     });
   }
@@ -63,6 +70,11 @@ export class ConsultarReservasComponent {
 
   seleccionarEstado(estado: string): void {
     this.filtro.estado = this.filtro.estado === estado ? '' : estado;
+    this.filtrarReservas();
+  }
+
+  seleccionarHorario(horario: string): void {
+    this.filtro.horarioInicio = this.filtro.horarioInicio === horario ? '' : horario;
     this.filtrarReservas();
   }
 }

@@ -3,23 +3,14 @@
     margin: 80px auto 50px;
     padding: 20px;
     text-align: center;
-    font-family: 'Poppins', sans-serif;
-    background: #e1fcee;
+    background: #ffffff;
     border-radius: 15px;
-    box-shadow: 0 4px 10px var(--title-shadow);
 }
 
 .form-row {
     display: flex;
     gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.custom-field {
-    width: 100%;
-    max-width: 350px;
+    justify-content: space-between;
 }
 
 mat-form-field {
@@ -39,14 +30,8 @@ input {
     border-radius: 8px;
     outline: none;
     transition: border-color 0.3s;
-    background: #e1fcee;
     color: var(--text);
     width: 100%;
-}
-
-input:hover,
-input:focus {
-    border-color: var(--button-color-primary);
 }
 
 mat-error {
@@ -61,7 +46,7 @@ mat-error {
 button {
     padding: 10px 20px;
     background: var(--button-color-primary);
-    color: #fff;
+    color: var(--text);
     font-size: 1.1em;
     border: none;
     border-radius: 30px;
@@ -70,15 +55,36 @@ button {
 }
 
 button:hover {
-    background: var(--button-color-primary-dark);
     transform: scale(1.05);
 }
 
 button:disabled {
-    background: #ccc;
     cursor: not-allowed;
 }
 
-button:disabled:hover {
-    background: #ccc;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+table th {
+    background: #e5e7eb;
+}
+
+table input[type="time"] {
+    width: 150px; 
+    padding: 5px;
+    font-size: 1em;
+}
+
+table input[type="checkbox"] {
+    transform: scale(1.2); 
 }

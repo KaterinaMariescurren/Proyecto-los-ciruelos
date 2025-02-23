@@ -1,48 +1,60 @@
-<div class="contenedor">
-    <h1 class="titulo">Consultar Reservas</h1>
+<div class="container">
+    <!-- Barra de Búsqueda y Filtros -->
+    <div class="filter-container">
+        <mat-form-field appearance="outline">
+            <input type="text" matInput placeholder="Buscar por nombre/email" [(ngModel)]="busqueda" (input)="filtrarReservas()">
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field >
 
-    <div class="filtros">
-        <label for="fecha">Fecha:</label>
-        <input type="date" [(ngModel)]="filtro.fecha" (change)="filtrarReservas()">
-        
-
-        <div class="categorias">
-            <button *ngFor="let cancha of canchas" 
-                [class.active]="filtro.cancha === cancha" 
-                (click)="seleccionarCancha(cancha)">
-                {{ cancha }}
-            </button>
-        </div>
-
-
-        <div class="categorias">
-            <button *ngFor="let estado of estados" 
-                [class.active]="filtro.estado === estado" 
-                (click)="seleccionarEstado(estado)">
-                {{ estado }}
-            </button>
+        <div class="filters">
+            <input type="date" [(ngModel)]="filtro.fecha" (change)="filtrarReservas()">
+            <select [(ngModel)]="filtro.cancha" (change)="filtrarReservas()">
+                <option value="">Seleccionar cancha</option>
+                <option *ngFor="let cancha of canchas" [value]="cancha">{{ cancha }}</option>
+            </select>
+            <select [(ngModel)]="filtro. horarioInicio" (change)="filtrarReservas()">
+                <option value="">Horario de reserva</option>
+                <option *ngFor="let horario of horarios" [value]="horario">{{ horario }}</option>
+            </select>
         </div>
     </div>
 
-
-    <div class="lista-reservas" *ngIf="reservasFiltradas.length > 0; else noReservas">
-        <div *ngFor="let reserva of reservasFiltradas" class="reserva-card">
-            <p><strong>Jugador:</strong> {{ reserva.jugador.nombre }}</p>
-            <p><strong>Fecha:</strong> {{ reserva.turno.fecha }}</p>
-            <p><strong>Horario:</strong> {{ reserva.turno.horarioInicio }} - {{ reserva.turno.horario_fin }}</p>
-            <p><strong>Cancha:</strong> N° {{ reserva.turno.cancha.numero }}</p>
-            <p><strong>Pelotas:</strong> {{ reserva.cantidad_pelotas }}</p>
-            <p><strong>Paletas:</strong> {{ reserva.cantidad_paletas }}</p>
-            <p><strong>Estado:</strong> {{ reserva.estado }}</p>
-    
-            <!-- Mostrar botón solo si la reserva NO está cancelada y la fecha NO ha pasado 
-            <button class="boton-cancelar" *ngIf="!esReservaCanceladaOExpirada(reserva)" (click)="cancelarReserva(reserva.id)">
-                Cancelar Reserva
-            </button> -->
+    <!-- Contenedor de la Tabla -->
+    <div class="table-container">
+        <div class="table-header">
+            <h2>Reservas</h2>
+            <button class="new-reservation-btn">+ Nueva Reserva</button>
         </div>
+        <table class="reservations-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Cancha</th>
+                    <th>Jugador</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let reserva of reservasFiltradas">
+                    <td>{{ reserva.turno.fecha }}</td>
+                    <td>{{ reserva.turno.horarioInicio }}</td>
+                    <td>{{ reserva.turno.cancha }}</td>
+                    <td>{{ reserva.jugador.nombre }}</td>
+                    <td>
+                        <span class="status" [ngClass]="{
+                            'confirmed': reserva.estado === 'Confirmado',
+                            'pending': reserva.estado === 'Pendiente'
+                        }">
+                            {{ reserva.estado }}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="delete-btn" (click)="cancelarReserva(reserva.id)">🗑</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-
-    <ng-template #noReservas>
-        <p class="mensaje-vacio">No hay reservas registradas que coincidan con los filtros aplicados.</p>
-    </ng-template>
 </div>

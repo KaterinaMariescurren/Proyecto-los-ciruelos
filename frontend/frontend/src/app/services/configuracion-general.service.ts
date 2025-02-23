@@ -13,10 +13,12 @@ export interface ConfiguracionGeneral {
   id: number;
   monto_reserva: number;
   monto_asociacion: number;
-  porcentaje_seña: number;
+  porcentaje_senia: number;
   descuento_socio: number;
   monto_paletas: number;
   monto_pelotas: number;
+  stock_pelotas: number;
+  stock_paletas: number;
   duracion_minima_turno: number;
   duracion_maxima_turno: number;
   horario_inicio_pico: string;

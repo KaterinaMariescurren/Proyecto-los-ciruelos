@@ -12,15 +12,18 @@ export class ConsultarUsuariosComponent {
   usuarioActual: any;
   usuarios: any[] = [];
   usuariosFiltrados: any[] = [];
+  busqueda: string = '';
 
   filtro = {
     categoria: '',
-    email: '',
-    nombre: '',
-    apellido: ''
+    socio: '',      
+    profesor: '' ,  
   };
 
-  categorias: string[] = ["Jugador", "Profesor", "Socio"];
+  categorias: string[] = [
+    'Principiante', 'Primera', 'Segunda', 'Tercera', 
+    'Cuarta', 'Quinta', 'Sexta', 'Séptima'
+  ];
 
   constructor(
     private authService: AuthService,
@@ -57,10 +60,14 @@ export class ConsultarUsuariosComponent {
   filtrarUsuarios(): void {
     this.usuariosFiltrados = this.usuarios.filter(usuario => {
       return (
+        (!this.busqueda || 
+          usuario.nombre.toLowerCase().includes(this.busqueda.toLowerCase()) || 
+          usuario.apellido.toLowerCase().includes(this.busqueda.toLowerCase()) ||
+          usuario.email.toLowerCase().includes(this.busqueda.toLowerCase())
+        ) &&
         (!this.filtro.categoria || usuario.categoria === this.filtro.categoria) &&
-        (!this.filtro.email || usuario.email.toLowerCase().includes(this.filtro.email.toLowerCase())) &&
-        (!this.filtro.nombre || usuario.nombre.toLowerCase().includes(this.filtro.nombre.toLowerCase())) &&
-        (!this.filtro.apellido || usuario.apellido.toLowerCase().includes(this.filtro.apellido.toLowerCase()))
+        (!this.filtro.socio || usuario.socio.toString().toLowerCase() === this.filtro.socio.toLowerCase()) &&
+        (!this.filtro.profesor || usuario.profesor.toString().toLowerCase() === this.filtro.profesor.toLowerCase())
       );
     });
   }
@@ -69,4 +76,16 @@ export class ConsultarUsuariosComponent {
     this.filtro.categoria = this.filtro.categoria === categoria ? '' : categoria;
     this.filtrarUsuarios();
   }
+
+  seleccionarSocio(valor: string): void {
+    this.filtro.socio = this.filtro.socio === valor ? '' : valor;
+    this.filtrarUsuarios();
+  }
+
+  seleccionarProfesor(valor: string): void {
+    this.filtro.profesor = this.filtro.profesor === valor ? '' : valor;
+    this.filtrarUsuarios();
+  }
+
+  displayedColumns: string[] = ['nombre', 'email', 'categoria', 'socio', 'profesor', 'acciones'];
 }

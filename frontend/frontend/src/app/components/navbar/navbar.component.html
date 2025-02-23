@@ -1,50 +1,46 @@
-<!-- Barra de navegación -->
-<nav class="navbar">
-    <div class="navbar__container">
-      <a routerLink="/" class="navbar-logo"></a>
-      <button (click)="navigateOrScroll('sobre-nosotros')" type="button">
-        Sobre Nosotros
-      </button>
-      <button (click)="navigateOrScroll('contactos')" type="button">
-        Contacto
-      </button>
-      <button (click)="navigateOrScroll('services')" type="button">
-        Servicios
-      </button>
+<!-- NAVBAR para usuarios normales (empleados) -->
+<nav *ngIf="(rol$ | async) !== 'duenio'" class="navbar">
+  <div class="navbar__container">
+    <a routerLink="/" class="navbar-logo"></a>
 
-      <button routerLink="/profesores" type="button">
-        Nuestros Profesores
-      </button>
-  
-      <!-- Mostrar el botón 'Iniciar sesión' si el usuario no está logueado -->
-      <button *ngIf="!isLoggedIn" routerLink="/login" type="button">
-        Iniciar Sesión
-      </button>
+    <div class="navbar-links">
+      <button (click)="navigateOrScroll('sobre-nosotros')" type="button">Sobre Nosotros</button>
+      <button (click)="navigateOrScroll('contactos')" type="button">Contacto</button>
+      <button (click)="navigateOrScroll('services')" type="button">Servicios</button>
+      <button routerLink="/profesores" type="button">Nuestros Profesores</button>
 
-      <!-- Mostrar el botón 'Mis reservas' si el usuario está logueado y no es admin -->
-      <button *ngIf="isLoggedIn && !isAdmin" routerLink="/mis-reservas" type="button">
-        Mis reservas
-      </button>
-      <!-- Mostrar botones adicionales si el usuario es admin -->
-      <button *ngIf="isAdmin" routerLink="/consultar_reservas" type="button">
-        Reservas
-      </button>
-      <button *ngIf="isAdmin" routerLink="/consultar_usuarios" type="button">
-        Usuarios
-      </button>
-      <button *ngIf="isAdmin" routerLink="/valores" type="button">
-        Valores
-      </button>
+      <!-- Botón de login si no está autenticado -->
+      <button *ngIf="!isLoggedIn" routerLink="/login" type="button">Iniciar Sesión</button>
 
-      
-      <!-- Mostrar el botón 'Mi perfil' si el usuario está logueado -->
-      <button *ngIf="isLoggedIn" routerLink="/perfil" type="button">
-        Mi perfil.
-      </button>
-      <!-- Mostrar el botón 'Cerrar sesión' si el usuario está logueado -->
-      <button *ngIf="isLoggedIn" (click)="logout()" type="button">
-        Cerrar Sesión
-      </button>
+      <!-- Botones extra para usuarios autenticados -->
+      <ng-container *ngIf="isLoggedIn">
+        <button *ngIf="(rol$ | async) !== 'duenio'" routerLink="/mis-reservas" type="button">Mis reservas</button>
+        <button routerLink="/perfil" type="button">Mi perfil</button>
+        <button (click)="logout()" type="button">Cerrar Sesión</button>
+      </ng-container>
     </div>
-  </nav>
+  </div>
+</nav>
 
+<!-- SIDEBAR para dueños -->
+<aside *ngIf="(rol$ | async) === 'duenio'" class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo"></div>
+    <button class="sidebar-close" (click)="logout()">Cerrar Sesión</button>
+  </div>
+
+  <ul class="sidebar-menu">
+    <li>
+      <button routerLink="/modificar_valores" type="button">Configuración General</button>
+    </li>
+    <li>
+      <button routerLink="/consultar_usuarios" type="button">Usuarios</button>
+    </li>
+    <li>
+      <button routerLink="/consultar_reservas" type="button">Reservas</button>
+    </li>
+    <li>
+      <button routerLink="/empleados" type="button">Empleados</button>
+    </li>
+  </ul>
+</aside>

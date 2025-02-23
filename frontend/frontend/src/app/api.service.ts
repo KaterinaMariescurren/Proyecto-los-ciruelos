@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient} from '@angular/common/http';
+import { HttpClient, HttpHeaders} from '@angular/common/http';
 import { AuthService } from './services/auth.service';
 import { Observable, switchMap, throwError } from 'rxjs';
 
@@ -186,5 +186,20 @@ export class ApiService {
     return this.http.put<any>(`${this.apiUrl}public/configuracion/actualizar`, nuevaConfiguracion);
   }
 
+  getRol(): Observable<{ message: string }> { 
+    return this.authService.getUserEmail().pipe(
+      switchMap(email => {
+        if (!email) {
+          console.error("Error: No se encontró un email válido.");
+          return throwError(() => new Error("No hay usuario autenticado"));
+        }
+        const url = `${this.apiUrl}public/verificar/empleado?email=${email}`;
+        return this.http.get<{ message: string }>(url); 
+      })
+    );
+  }
+  
+  
+  
   
 }

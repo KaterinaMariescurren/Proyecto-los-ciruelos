@@ -16,7 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSelectModule } from '@angular/material/select';
-
+import { MatTableModule } from '@angular/material/table';
 
 // Components
 import { AppComponent } from './app.component';
@@ -90,6 +90,7 @@ import { ModificarValoresComponent } from './components/shared/modificar_valores
     MatFormFieldModule,
     MatInputModule,
     MatToolbarModule,
+    MatTableModule,
     MatSelectModule,
     NgOptimizedImage,
     MatCheckboxModule,

@@ -2,6 +2,9 @@ package Grupo11.Seminario.Controller;
 
 import java.util.Optional;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,13 +25,18 @@ public class EmpleadoController {
     EmpleadoService empleadoService;
 
     @GetMapping("/verificar/empleado")
-    public ResponseEntity<String> verificarEmpleado(@RequestParam String email) {
+    public ResponseEntity<Map<String, String>> verificarEmpleado(@RequestParam String email) {
         Optional<Empleado> empleado = empleadoService.buscarPorEmail(email);
-
+    
+        Map<String, String> response = new HashMap<>();
+    
         if (empleado.isPresent()) {
-            return ResponseEntity.ok(empleado.get().getDuenio() ? "duenio" : "empleado");
+            response.put("message", empleado.get().getDuenio() ? "duenio" : "empleado");
+            return ResponseEntity.ok(response);
         }
-
-        return ResponseEntity.badRequest().body("no se encontro el empleado");
+    
+        response.put("message", "no se encontro empleado");
+        return ResponseEntity.badRequest().body(response);
     }
+
 }

@@ -99,7 +99,7 @@ export class ReservaComponent {
       let precioBase = (pelotas * this.precioPelota) + (paletas * this.precioPaleta) + this.configuracion?.monto_reserva;
   
       if (this.pago === "seña") {
-        this.precio = precioBase * this.configuracion.porcentaje_seña;
+        this.precio = precioBase * this.configuracion.porcentaje_senia;
       } else {
         this.precio = precioBase;
       }
