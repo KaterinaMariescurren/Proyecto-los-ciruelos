@@ -33,13 +33,6 @@ import { VerificarCorreoComponent } from './components/shared/verificar-correo/v
 import { BeneficiosSociosComponent } from './components/beneficios-socios/beneficios-socios.component';
 import { AsociarComponent } from './components/beneficios-socios/asociar/asociar.component';
 import { DesasociarComponent } from './components/beneficios-socios/desasociar/desasociar.component'; 
-
-// Firebase
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { getAuth, provideAuth } from '@angular/fire/auth';
-import { AngularFireModule } from '@angular/fire/compat';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { environment } from '../environments/environment';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { PerfilComponent } from './components/shared/perfil/perfil.component';
 import { TicketComponent } from './components/shared/ticket/ticket.component';
@@ -50,7 +43,17 @@ import { ProfesoresComponent } from './components/shared/profesores/profesores.c
 import { ConsultarReservasComponent } from './components/shared/consultar_reservas/consultar_reservas.component';
 import { ConsultarUsuariosComponent } from './components/shared/consultar_usuarios/consultar_usuarios.component';
 import { ModificarValoresComponent } from './components/shared/modificar_valores/modificar_valores.component';
-import { EmpleadoComponent } from './components/shared/empleado/empleado.component';
+import { RegisterEmpleadoComponent } from './components/shared/register-empleado/register-empleado.component';
+import { ConsultarEmpleadoComponent } from './components/shared/consultar-empleado/consultar-empleado.component';
+
+// Firebase
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { AngularFireModule } from '@angular/fire/compat';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { environment } from '../environments/environment';
+import { ReservasDuenioComponent } from './components/shared/reservas-duenio/reservas-duenio.component';
+
 
 
 @NgModule({
@@ -79,7 +82,9 @@ import { EmpleadoComponent } from './components/shared/empleado/empleado.compone
     ConsultarReservasComponent,
     ConsultarUsuariosComponent,
     ModificarValoresComponent,
-    EmpleadoComponent
+    RegisterEmpleadoComponent,
+    ConsultarEmpleadoComponent,
+    ReservasDuenioComponent
 
   ],
   imports: [

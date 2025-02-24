@@ -1,0 +1,196 @@
+/* Contenedor principal del calendario */
+.container {
+    margin-left: 20%;
+    padding: 30px;
+    margin-top: 10px;
+}
+
+.calendar-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 10px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px black;
+    font-family: "Roboto";
+    width: 100%;
+    max-width: calc(100vw - 40px);
+    /* 20px de espacio a la izquierda y derecha */
+    height: 100%;
+    overflow-x: auto;
+    flex-wrap: wrap;
+}
+
+/* Estilizar la tabla */
+.calendar-table {
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 600px;
+    table-layout: fixed;
+    /* Asegura que las celdas no se desborden */
+}
+
+/* Encabezado de la tabla */
+.calendar-table thead th {
+    font-size: 16px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Selector de fecha */
+.date-picker-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.date-picker {
+    width: 100%;
+    font-size: 12px;
+}
+
+/* Nombre de la cancha */
+.court-name {
+    text-align: center;
+    background-color: white;
+    font-size: 16px;
+}
+
+/* Estilizar celdas de tiempo */
+.cell {
+    border-bottom: 2px solid white;
+    height: 50px;
+    width: 50px;
+    padding-left: 2px;
+    cursor: pointer;
+    transition: var(--button-color-primary) 0.3s;
+}
+
+/* ----- Header de la tabla (Usuarios + Botón Nuevo Jugador) ----- */
+.header {
+    max-width: 97%;
+    /* Ajusta según sea necesario */
+    margin: 0 auto;
+    /* Centra el header */
+    display: flex;
+    justify-content: space-between;
+    /* Alinea el título a la izquierda y el botón a la derecha */
+    align-items: center;
+    /* Centra verticalmente */
+    padding: 10px 20px;
+    background-color: white;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.header .titulo {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Celdas resaltadas */
+.highlight {
+    background-color: var(--button-color-primary) !important;
+}
+
+/* Celdas de tiempo pasado */
+.past-time {
+    background-color: var(--pass-time);
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Celdas reservadas */
+.reserved {
+    background-color: rgba(255, 0, 0, 0.6);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Menú de opciones */
+.options-menu {
+    position: absolute;
+    width: 200px;
+    background-color: var(--background-accent);
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    padding: 8px;
+    transition: all 0.3s ease;
+}
+
+/* Información dentro del menú */
+.info-box {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+/* Opciones dentro del menú */
+.option {
+    padding: 8px;
+    margin: 3px 0;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Media queries para pantallas más pequeñas */
+
+/* Pantallas de 1366px de ancho o menores */
+@media (max-width: 1366px) {
+    .calendar-container {
+        max-width: calc(100vw - 40px);
+        /* Mantener el margen de 20px a cada lado */
+        margin-right: 10px;
+        /* Añadido margen derecho */
+    }
+
+    .calendar-table {
+        font-size: 12px;
+        /* Reducimos el tamaño de la fuente */
+    }
+
+    .cell {
+        width: 30px;
+        /* Reducimos el tamaño de las celdas */
+        height: 50px;
+        /* Ajustamos la altura */
+    }
+
+    .court-name {
+        font-size: 14px;
+        /* Reducimos el tamaño de los nombres de las canchas */
+    }
+
+    .options-menu {
+        width: 180px;
+        /* Reducimos el tamaño del menú */
+    }
+
+    .date-picker-wrapper {
+        font-size: 14px;
+        /* Ajustamos el tamaño del selector de fechas */
+    }
+
+    .highlight {
+        font-size: 14px;
+        /* Aseguramos que las celdas resaltadas no se vean muy grandes */
+    }
+
+    /* Reducir la altura de las celdas de tiempo, dado que hay menos espacio vertical */
+    .cell {
+        height: 45px;
+        /* Menos espacio entre celdas */
+    }
+
+    .calendar-table thead th {
+        font-size: 14px;
+        /* Reducimos el tamaño de las cabeceras */
+    }
+}

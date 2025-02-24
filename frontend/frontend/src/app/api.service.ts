@@ -56,6 +56,15 @@ export interface UsuarioDTO {
   categoria: string;
 }
 
+export interface EmpleadoDTO {
+  email: string;
+  nombre: string;
+  apellido: string;
+  telefonos: Telefono[];
+  duenio: boolean;
+}
+
+
 @Injectable({
   providedIn: 'root',
 })
@@ -148,6 +157,11 @@ export class ApiService {
   registrarUsuario(jugadorDTO: JugadorDTO): Observable<any> {
     const url = `${this.apiUrl}public/registro/jugador`;
       return this.http.post<any>(url, jugadorDTO);
+    }
+
+    registrarEmpleado(emailUsuario: string, empleadoDTO: EmpleadoDTO): Observable<any> {
+      const url = `${this.apiUrl}public/registro/empleado?email=${encodeURIComponent(emailUsuario)}`;
+      return this.http.post<any>(url, empleadoDTO);
     }
 
   asociarse(id_mp: number): Observable<any> {

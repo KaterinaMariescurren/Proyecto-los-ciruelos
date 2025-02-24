@@ -1,6 +1,11 @@
+.home-sidebar {
+    min-height: 100vh;
+    margin-left: 20%;
+    padding: 20px;
+}
+
 .form__container {
     max-width: 800px;
-    margin: 80px auto 50px;
     padding: 20px;
     text-align: center;
     background: #ffffff;

@@ -35,6 +35,8 @@ public class ConfiguracionGeneralService {
             config.setMonto_asociacion(10000.0f);
             config.setMonto_x_media_hora(5000f);
             config.setPorcentaje_seña(0.25f);
+            config.setStock_pelota(100);
+            config.setStock_paleta(50);
             
             // Se setean todas las horas
             LocalTime hora_inicio_pico = LocalTime.of(12, 0);
@@ -85,6 +87,8 @@ public class ConfiguracionGeneralService {
         this.configuracion_general.setMonto_x_media_hora(nueva_configuracion.getMonto_x_media_hora());
         this.configuracion_general.setMonto_asociacion(nueva_configuracion.getMonto_asociacion());
         this.configuracion_general.setPorcentaje_seña(nueva_configuracion.getPorcentaje_seña());
+        this.configuracion_general.setStock_pelota(nueva_configuracion.getStock_pelota());
+        this.configuracion_general.setStock_paleta(nueva_configuracion.getStock_paleta());
             
         // Se setean todas las horas
         this.configuracion_general.setHorario_inicio_pico(nueva_configuracion.getHorario_inicio_pico());

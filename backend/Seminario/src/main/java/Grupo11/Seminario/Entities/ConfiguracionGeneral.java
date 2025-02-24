@@ -57,6 +57,12 @@ public class ConfiguracionGeneral {
     @Column(nullable = false, name = "monto_x_media_hora")
     private Float monto_x_media_hora;
 
+    @Column(nullable = false, name = "stock_paleta")
+    private Integer stock_paleta;
+
+    @Column(nullable = false, name = "stock_pelota")
+    private Integer stock_pelota;
+
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(nullable = false, name = "configuracion_general_id")
     private List<DiaApertura> dias_apertura = new ArrayList<>();

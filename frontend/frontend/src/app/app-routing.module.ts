@@ -33,7 +33,9 @@ import { ConsultarReservasComponent } from './components/shared/consultar_reserv
 import { ConsultarUsuariosComponent } from './components/shared/consultar_usuarios/consultar_usuarios.component';
 import { ModificarValoresComponent } from './components/shared/modificar_valores/modificar_valores.component';
 import { CalendarioReservaComponent } from './components/shared/calendario_reserva/calendario_reserva.component';
-import { EmpleadoComponent } from './components/shared/empleado/empleado.component';
+import { RegisterEmpleadoComponent } from './components/shared/register-empleado/register-empleado.component';
+import { ConsultarEmpleadoComponent } from './components/shared/consultar-empleado/consultar-empleado.component';
+import { ReservasDuenioComponent } from './components/shared/reservas-duenio/reservas-duenio.component';
 
 
 const routes: Routes = [
@@ -48,7 +50,7 @@ const routes: Routes = [
   { path: 'verificar-correo', component: VerificarCorreoComponent, canActivate: [noAuthGuard] },
   { path: 'profesores', component: ProfesoresComponent }, 
   { path: 'beneficios', component: BeneficiosSociosComponent },
-  { path: 'calendario', component:CalendarioReservaComponent},
+  { path: 'calendario', component: ReservasDuenioComponent},
 
 //--------------------- Rutas protegida (con autenticacion) ------------------------------------------------
   { path: 'mercadopago', component: MercadopagoComponent, canActivate: [authGuard] },
@@ -57,12 +59,13 @@ const routes: Routes = [
   { path: 'procesar-pago', component: ProcesarPagoComponent, canActivate: [authGuard] },
   { path: 'mis-reservas', component: MisReservasComponent, canActivate: [authGuard]  },
   { path: 'perfil', component: PerfilComponent, canActivate: [authGuard]  }, 
+  { path: 'register-empleado', component: RegisterEmpleadoComponent, canActivate: [authGuard] },
 
 //--------------------- Rutas protegida (SOLO administrador) ------------------------------------------------
   { path: 'consultar_reservas', component: ConsultarReservasComponent },
   { path: 'consultar_usuarios', component: ConsultarUsuariosComponent  },
   { path: 'modificar_valores', component: ModificarValoresComponent },
-  { path: 'empleado', component: EmpleadoComponent },
+  { path: 'consultar-empleado', component: ConsultarEmpleadoComponent },
 
   // , canActivate: [roleGuard], data: { role: 'duenio' }
 

@@ -3,10 +3,10 @@
     <div class="overlay">
       <header class="home_header">
         <h1>Los Ciruelos Padel Club</h1>
-        <p class="description">
+        <h2 class="description">
           Alcanza tu mejor nivel
-        </p>
-        <p class="description">Elige tu turno</p>
+        </h2>
+        <h2 class="description">Elige tu turno</h2>
       </header>
 
       <div id="calendario" class="calendario">
@@ -88,6 +88,8 @@
 
 </div>
 
+<!-- ----------------------------- VISTA DUEÑO ------------------------------------------ -->
+
 <div *ngIf="rol === 'duenio'" class="home-sidebar">
   <div class="dashboard-content">
     <div class="stat-cards">
@@ -133,7 +135,7 @@
       
       <div class="action-card">
         <!-- agregar que cuando se registre lo lleve para la tabla asi le pone el rol o ver como hacer para ponerle el rol -->
-        <button routerLink="/register"> 
+        <button routerLink="/register-empleado"> 
           <div class="icon-container">
             <span class="material-icons">work</span>
           </div>

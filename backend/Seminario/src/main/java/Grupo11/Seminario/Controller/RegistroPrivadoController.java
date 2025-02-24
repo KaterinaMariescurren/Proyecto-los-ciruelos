@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 import Grupo11.Seminario.DTO.EmpleadoDTO;
 import Grupo11.Seminario.Entities.Empleado;
 import Grupo11.Seminario.Entities.Usuario;
@@ -16,7 +17,7 @@ import Grupo11.Seminario.Service.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/private/")
+@RequestMapping("/public/")
 public class RegistroPrivadoController {
     
     @Autowired
@@ -26,8 +27,7 @@ public class RegistroPrivadoController {
 
     // Controlador privado para registrar a un empleado en la aplicacion
     @PostMapping(path = "/registro/empleado")
-    public ResponseEntity<?> registro_empleado(HttpServletRequest request, @RequestBody EmpleadoDTO empleadoDTO){
-        String email = (String) request.getAttribute("email");
+    public ResponseEntity<?> registro_empleado(@RequestParam String email , @RequestBody EmpleadoDTO empleadoDTO){
     
         Optional<Usuario> usuario = usuarioService.buscar_usuario(email);
         Integer id_duenio = usuario.get().getId();

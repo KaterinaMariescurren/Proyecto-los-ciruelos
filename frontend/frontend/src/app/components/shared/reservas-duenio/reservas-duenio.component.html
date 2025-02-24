@@ -1,0 +1,55 @@
+<!-- Contenedor principal -->
+
+<div class="container">
+    <div class="header">
+        <h2 class="titulo">Nueva reserva</h2>
+    </div>
+    <div class="calendar-container">
+        <div class="table-wrapper">
+            <!-- Tabla de calendario -->
+            <table class="calendar-table">
+                <thead>
+                    <tr>
+                        <th class="date-header">
+                            <div class="date-picker-wrapper">
+                                <input type="date" id="date-picker" class="date-picker" [(ngModel)]="selectedDate"
+                                    (change)="onDateChange($event)" [attr.min]="minDate" />
+                            </div>
+                        </th>
+                        <th *ngFor="let slot of timeSlotsDisplay ">{{ slot }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let court of courts">
+                        <td class="court-name">{{ court.name }}</td>
+                        <td *ngFor="let slot of timeSlots" [ngClass]="{
+                'cell': true,
+                'highlight': isHighlighted(court.id, slot),
+                'half-highlight': isHalfHighlighted(court.id, slot),
+                'past-time': isPastTime(slot),
+                'reserved': isReserved(court.id, slot) === 'red',
+                'blocked': isNotEnoughTimeBetweenReservations(court.id, slot),
+                }" (click)="!isPastTime(slot) && !isReserved(court.id, slot) && !isNotEnoughTimeBetweenReservations(court.id, slot) && showTimeOptions(court, slot, $event)">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <!-- Menú de opciones -->
+    <div *ngIf="showOptionsMenu" class="options-menu"
+        [ngStyle]="{ top: optionsMenuPosition.top + 'px', left: optionsMenuPosition.left + 'px' }">
+        <div class="info-box">
+            <span>Blindex y sintético | Con iluminación | Techada</span><br />
+        </div>
+        <div class="option" (click)="onButtonClick()">1h 30min $
+            {{ isLoggedIn && isSocio
+            ? (configuracion?.monto_reserva ?? 0) - ((configuracion?.monto_reserva ?? 0) *
+            (configuracion?.descuento_socio ?? 0))
+            : (configuracion?.monto_reserva ?? 0) }}
+        </div>
+
+    </div>
+</div>

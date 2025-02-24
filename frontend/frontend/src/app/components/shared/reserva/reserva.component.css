@@ -14,6 +14,12 @@
     }
 }
 
+.form {
+    margin-left: 10%;
+    padding: 30px;
+
+}
+
 .form__container {
     width: 100%;
     max-width: 800px;

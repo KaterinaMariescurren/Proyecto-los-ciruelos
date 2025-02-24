@@ -4,8 +4,9 @@
     margin-top: 10px;
 }
 
-/* ----- Header  ----- */
+/* ----- Header de la tabla (Usuarios + Botón Nuevo Jugador) ----- */
 .header {
+    max-width: 97%; /* Ajusta según sea necesario */
     margin: 0 auto; /* Centra el header */
     display: flex;
     justify-content: space-between; /* Alinea el título a la izquierda y el botón a la derecha */
