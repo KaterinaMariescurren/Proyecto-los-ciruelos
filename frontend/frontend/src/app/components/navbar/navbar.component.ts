@@ -36,23 +36,21 @@ export class NavbarComponent implements OnInit {
     this.authService.getUsuario().subscribe(user => {
       this.isLoggedIn = !!user;
       console.log("Usuario autenticado:", this.isLoggedIn);
-    });
   
-    this.rol$ = this.apiService.getRol().pipe(
-      map((data: any) => data.message || 'none') // Extraer el mensaje correctamente
-    );
-    
-    this.apiService.getRol().subscribe({
-      next: (data: any) => {
-        this.rol = data.message; 
-        console.log("Rol obtenido:", this.rol); // <-- Agrega este log
+      if (this.isLoggedIn) {
+        this.apiService.getRol().subscribe(response => {
+          this.rol = response.message; // Asegurarte de que la API devuelve el rol correctamente
+          this.apiService.setRolInStorage(this.rol);
+          this.cdRef.detectChanges(); // Forzar actualización del Navbar
+        });
+      } else {
+        this.rol = null;
+        this.apiService.setRolInStorage("");
         this.cdRef.detectChanges();
-      },
-      error: (err) => {
-        this.rol = 'none';
-        console.error("Error al obtener el rol:", err);
       }
     });
+  
+    this.rol = this.apiService.getRolFromStorage(); // Recuperar el rol guardado al iniciar
   }
   
 
@@ -68,8 +66,12 @@ export class NavbarComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+    this.apiService.setRolInStorage(""); // Eliminar el rol del storage
+    this.rol = null; // Resetear el rol en la vista
+    this.cdRef.detectChanges(); // Forzar la actualización del navbar
     this.toastrService.success('Has cerrado sesión correctamente', 'Logout');
-  }
+    this.router.navigate(['/home']); // Redireccionar a home
+  }  
 
   private scrollToSection(sectionId: string) {
     const element = document.getElementById(sectionId);

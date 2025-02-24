@@ -11,7 +11,6 @@ import { ApiService } from '../../../api.service';
 })
 export class ModificarValoresComponent implements OnInit {
   form!: FormGroup;
-  configuracion: ConfiguracionGeneral | null = null;
 
   monto_reserva = 0;
   monto_asociacion = 0;
@@ -48,20 +47,23 @@ export class ModificarValoresComponent implements OnInit {
 
   obtenerConfiguracion(): void {
     this.configuracionService.getConfiguracion().subscribe(config => {
-      this.configuracionService.setConfiguracion(config);
-      this.configuracion = config;
-
-      this.monto_reserva = this.configuracion.monto_reserva ;
-      this.monto_asociacion = this.configuracion.monto_asociacion ;
-      this.porcentaje_senia = this.configuracion.porcentaje_senia ;
-      this.descuento_socio = this.configuracion.descuento_socio ;
-      this.monto_paletas = this.configuracion.monto_paletas ;
-      this.stock_paletas = this.configuracion.stock_paletas ;
-      this.monto_pelotas = this.configuracion.monto_pelotas ;
-      this.stock_pelotas = this.configuracion.stock_pelotas ;
-      this.duracion_maxima_turno = this.configuracion.duracion_maxima_turno ;
+      console.log(config);
+      
+      // Actualizamos los valores en el formulario
+      this.form.patchValue({
+        monto_reserva: config.monto_reserva,
+        monto_asociacion: config.monto_asociacion,
+        porcentaje_senia: config.porcentaje_seña,
+        descuento_socio: config.descuento_socio,
+        monto_paletas: config.monto_paletas,
+        monto_pelotas: config.monto_pelotas,
+        stock_paletas: config.stock_paletas,
+        stock_pelotas: config.stock_pelotas,
+        duracion_maxima_turno: config.duracion_maxima_turno,
+      });
     });
   }
+  
 
   guardarConfiguracion(): void {
     if (this.form.invalid) {

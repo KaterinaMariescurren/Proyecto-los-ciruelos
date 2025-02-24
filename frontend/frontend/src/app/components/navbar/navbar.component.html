@@ -1,5 +1,5 @@
 <!-- NAVBAR para usuarios normales (empleados) -->
-<nav *ngIf="(rol$ | async) !== 'duenio'" class="navbar">
+<nav *ngIf="rol !== 'duenio'" class="navbar">
   <div class="navbar__container">
     <a routerLink="/" class="navbar-logo"></a>
 
@@ -14,7 +14,7 @@
 
       <!-- Botones extra para usuarios autenticados -->
       <ng-container *ngIf="isLoggedIn">
-        <button *ngIf="(rol$ | async) !== 'duenio'" routerLink="/mis-reservas" type="button">Mis reservas</button>
+        <button routerLink="/mis-reservas" type="button">Mis reservas</button>
         <button routerLink="/perfil" type="button">Mi perfil</button>
         <button (click)="logout()" type="button">Cerrar Sesión</button>
       </ng-container>
@@ -23,9 +23,9 @@
 </nav>
 
 <!-- SIDEBAR para dueños -->
-<aside *ngIf="(rol$ | async) === 'duenio'" class="sidebar">
+<aside *ngIf="rol === 'duenio'" class="sidebar">
   <div class="sidebar-header">
-    <div class="sidebar-logo"></div>
+    <div routerLink="/home" class="sidebar-logo"></div>
     <button class="sidebar-close" (click)="logout()">Cerrar Sesión</button>
   </div>
 
@@ -38,9 +38,6 @@
     </li>
     <li>
       <button routerLink="/consultar_reservas" type="button">Reservas</button>
-    </li>
-    <li>
-      <button routerLink="/empleados" type="button">Empleados</button>
     </li>
   </ul>
 </aside>
