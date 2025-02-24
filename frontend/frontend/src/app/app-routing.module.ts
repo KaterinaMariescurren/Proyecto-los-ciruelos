@@ -32,6 +32,8 @@ import { MercadopagoComponent } from './components/shared/mercadopago/mercadopag
 import { ConsultarReservasComponent } from './components/shared/consultar_reservas/consultar_reservas.component';
 import { ConsultarUsuariosComponent } from './components/shared/consultar_usuarios/consultar_usuarios.component';
 import { ModificarValoresComponent } from './components/shared/modificar_valores/modificar_valores.component';
+import { CalendarioReservaComponent } from './components/shared/calendario_reserva/calendario_reserva.component';
+import { EmpleadoComponent } from './components/shared/empleado/empleado.component';
 
 
 const routes: Routes = [
@@ -46,6 +48,7 @@ const routes: Routes = [
   { path: 'verificar-correo', component: VerificarCorreoComponent, canActivate: [noAuthGuard] },
   { path: 'profesores', component: ProfesoresComponent }, 
   { path: 'beneficios', component: BeneficiosSociosComponent },
+  { path: 'calendario', component:CalendarioReservaComponent},
 
 //--------------------- Rutas protegida (con autenticacion) ------------------------------------------------
   { path: 'mercadopago', component: MercadopagoComponent, canActivate: [authGuard] },
@@ -56,9 +59,12 @@ const routes: Routes = [
   { path: 'perfil', component: PerfilComponent, canActivate: [authGuard]  }, 
 
 //--------------------- Rutas protegida (SOLO administrador) ------------------------------------------------
-  { path: 'consultar_reservas', component: ConsultarReservasComponent, canActivate: [roleGuard], data: { role: 'duenio' } },
-  { path: 'consultar_usuarios', component: ConsultarUsuariosComponent, canActivate: [roleGuard], data: { role: 'duenio' }  },
-  { path: 'modificar_valores', component: ModificarValoresComponent, canActivate: [roleGuard], data: { role: 'duenio' } },
+  { path: 'consultar_reservas', component: ConsultarReservasComponent },
+  { path: 'consultar_usuarios', component: ConsultarUsuariosComponent  },
+  { path: 'modificar_valores', component: ModificarValoresComponent },
+  { path: 'empleado', component: EmpleadoComponent },
+
+  // , canActivate: [roleGuard], data: { role: 'duenio' }
 
 //--------------------- Redirección en caso de rutas inválidas ------------------------------------------------
   { path: '**', redirectTo: 'home' }

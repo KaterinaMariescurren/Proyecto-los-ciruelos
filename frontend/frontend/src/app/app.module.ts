@@ -50,6 +50,7 @@ import { ProfesoresComponent } from './components/shared/profesores/profesores.c
 import { ConsultarReservasComponent } from './components/shared/consultar_reservas/consultar_reservas.component';
 import { ConsultarUsuariosComponent } from './components/shared/consultar_usuarios/consultar_usuarios.component';
 import { ModificarValoresComponent } from './components/shared/modificar_valores/modificar_valores.component';
+import { EmpleadoComponent } from './components/shared/empleado/empleado.component';
 
 
 @NgModule({
@@ -77,7 +78,8 @@ import { ModificarValoresComponent } from './components/shared/modificar_valores
     ProfesoresComponent,
     ConsultarReservasComponent,
     ConsultarUsuariosComponent,
-    ModificarValoresComponent
+    ModificarValoresComponent,
+    EmpleadoComponent
 
   ],
   imports: [
