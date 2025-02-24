@@ -13,7 +13,7 @@ export interface ConfiguracionGeneral {
   id: number;
   monto_reserva: number;
   monto_asociacion: number;
-  porcentaje_senia: number;
+  porcentaje_seña: number;
   descuento_socio: number;
   monto_paletas: number;
   monto_pelotas: number;

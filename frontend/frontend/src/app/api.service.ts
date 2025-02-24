@@ -198,8 +198,12 @@ export class ApiService {
       })
     );
   }
-  
-  
-  
-  
+
+  setRolInStorage(rol: string) {
+    localStorage.setItem('userRole', rol); // O sessionStorage si prefieres
+  }
+
+  getRolFromStorage(): string | null {
+    return localStorage.getItem('userRole');
+  }
 }

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, Credential } from '../../../services/auth.service';
 import { FirebaseErrorService } from '../../../services/firebase-error.service';
 import { ToastrService } from 'ngx-toastr';
+import { ApiService } from '../../../api.service';
 
 interface LoginForm {
   email: FormControl<string>;
@@ -27,7 +28,8 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute,
     private authService: AuthService,
     private firebaseError: FirebaseErrorService,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private api: ApiService,
   ) {
     this.form = this.formBuilder.group({
       email: this.formBuilder.control('', { validators: [Validators.required], nonNullable: true }),
@@ -51,6 +53,13 @@ export class LoginComponent implements OnInit {
       this.authService.loginWithEmailAndPassword(credential)
         .then((user) => {
           //Verificar que el mail este registrado en el Backend sino no lo esta Mandar al PostRegister
+          
+          // Obtener el rol y almacenarlo
+          this.api.getRol().subscribe(roleData => {
+            this.api.setRolInStorage(roleData.message);
+            console.log("Rol guardado:", roleData.message);
+          });
+
           const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
           this.router.navigate([returnUrl]);
         })
