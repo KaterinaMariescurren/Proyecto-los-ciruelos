@@ -147,6 +147,8 @@ public class ReservaController {
 
                     // Se guarda la Reserva y el Turno
                     reserva_service.guardar_reserva(reserva);
+
+                    // restar stock de paletas y pelotas
                     
                     return ResponseEntity.ok().body(reservaDTO);
                 }
@@ -177,11 +179,14 @@ public class ReservaController {
                 Reserva reserva = optReserva.get();
                 reserva.setEstado(EstadoReserva.Cancelada);
                 reserva_service.guardar_reserva(reserva);
+
+                // sumar paletas y pelotas 
                 return ResponseEntity.ok(response);
             }
         }
         response.put("message", "No se encontro al usuario");
         return ResponseEntity.badRequest().body(response);
+
     }
 
     @GetMapping(path = "/reservas/filtrar")

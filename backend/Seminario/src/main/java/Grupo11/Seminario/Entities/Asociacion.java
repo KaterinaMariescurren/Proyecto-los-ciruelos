@@ -43,6 +43,6 @@ public class Asociacion {
     private Empleado duenio;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(nullable = false, name = "pago_id")
+    @JoinColumn(nullable = true, name = "pago_id")
     private Pago pago;
 }

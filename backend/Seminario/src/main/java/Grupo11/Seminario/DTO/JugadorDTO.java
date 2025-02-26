@@ -18,13 +18,14 @@ public class JugadorDTO {
 
     // Constructor con argumentos
     public JugadorDTO(
-    String email, String nombre, String apellido, String categoria, List<Telefono> telefonos) 
+    String email, String nombre, String apellido, String categoria, List<Telefono> telefonos ) 
     {
         this.email = email;
         this.nombre = nombre;
         this.apellido = apellido;
         this.categoria = categoria;
         this.telefonos = telefonos;
+        
     }
     
     // Método estático para convertir de Jugador (entidad) a JugadorDTO
@@ -36,6 +37,9 @@ public class JugadorDTO {
             jugador.getCategoria().toString(), // Convertimos el enum a String
             jugador.getTelefonos()
         );
+
+        jugadorDTO.setProfesor(jugador.getProfesor());
+        jugadorDTO.setSocio(jugador.getSocio());
 
         jugadorDTO.setId(jugador.getId());
         return jugadorDTO;

@@ -15,7 +15,7 @@ import {
   sendEmailVerification,
   fetchSignInMethodsForEmail,
 } from '@angular/fire/auth';
-import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -177,28 +177,24 @@ export class AuthService {
 
   getUserRole(): Observable<string | null> {
     return this.authState$.pipe(
+      tap(user => console.log("🔍 Usuario autenticado en authState$:", user)), // <-- Agregar log aquí
       switchMap((user) => {
         if (!user) {
-          return of(null); // Si no hay usuario, retornamos null
+          console.warn("⚠️ No hay usuario autenticado, retornando null");
+          return of(null);
         }
-
-        // Llamamos al backend para verificar el rol (empleado o duenio)
+  
         return this.http.get<{ message: string }>(`/public/verificar/empleado?email=${user.email}`).pipe(
-          map((response) => {
-            console.log('Respuesta del backend:', response); // Verifica lo que devuelve el backend
-            return response.message; // Retorna el rol
-          }),
+          tap(response => console.log("📢 Respuesta del backend:", response)), // <-- Verifica la respuesta del backend
+          map((response) => response.message),
           catchError(error => {
-            console.error('Error al obtener el rol del usuario:', error);
-            console.error('Cuerpo del error:', error.error);  // Aquí miramos el cuerpo de la respuesta de error
-            console.error('Status del error:', error.status);  // Verifica el código de estado HTTP
-            console.error('Mensaje del error:', error.message);  // Mensaje de error general
-            return of(null); // En caso de error, devolvemos null
+            console.error("⛔ Error al obtener el rol:", error);
+            return of(null);
           })
         );
       })
     );
   }
-
+  
 
 }

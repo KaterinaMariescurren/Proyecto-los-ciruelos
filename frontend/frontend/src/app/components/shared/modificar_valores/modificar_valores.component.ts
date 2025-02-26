@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { ConfiguracionGeneral, ConfiguracionService } from '../../../services/configuracion-general.service';
 import { ApiService } from '../../../api.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-modificar_valores',
@@ -11,35 +12,45 @@ import { ApiService } from '../../../api.service';
 })
 export class ModificarValoresComponent implements OnInit {
   form!: FormGroup;
-
-  monto_reserva = 0;
-  monto_asociacion = 0;
-  porcentaje_senia = 0;
-  descuento_socio = 0;
-  monto_paletas = 0;
-  monto_pelotas = 0;
-  stock_paletas = 0;
-  stock_pelotas = 0;
-  duracion_maxima_turno = 0;
+  formModificado: boolean = false;
+  duenioEmail: string = '';
+  diasApertura: any[] = [];
+  originalValues: any = {};
+  
 
   constructor(
     private formBuilder: FormBuilder,
     private toastrService: ToastrService,
     private configuracionService: ConfiguracionService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private authService: AuthService,
   ) { }
 
   ngOnInit(): void {
+    this.authService.getUserEmail().subscribe((email) => {
+      console.log('📧 Email del dueño:', email);
+      if (!email) {
+        this.toastrService.error('No se pudo obtener el email del dueño', 'Error');
+        return;
+      }
+      this.duenioEmail = email; 
+    });
+
     this.form = this.formBuilder.group({
       monto_reserva: [0, [Validators.required, Validators.min(0)]],
       monto_asociacion: [0, [Validators.required, Validators.min(0)]],
-      porcentaje_senia: [0, [Validators.required, Validators.min(0)]],
+      porcentaje_seña: [0, [Validators.required, Validators.min(0)]],
       descuento_socio: [0, [Validators.required, Validators.min(0)]],
       monto_paletas: [0, [Validators.required, Validators.min(0)]],
       monto_pelotas: [0, [Validators.required, Validators.min(0)]],
-      stock_paletas: [0, [Validators.required, Validators.min(0)]],
-      stock_pelotas: [0, [Validators.required, Validators.min(0)]],
+      stock_paleta: [0, [Validators.required, Validators.min(0)]],
+      stock_pelota: [0, [Validators.required, Validators.min(0)]],
+      duracion_minima_turno: [0, [Validators.required, Validators.min(0)]],
       duracion_maxima_turno: [0, [Validators.required, Validators.min(0)]],
+      horario_inicio_pico: ['00:00:00'],
+      horario_fin_pico: ['00:00:00'],
+      monto_x_media_hora: [0, [Validators.required, Validators.min(0)]],
+      dias_apertura: [[]]
     });
 
     this.obtenerConfiguracion();
@@ -47,53 +58,81 @@ export class ModificarValoresComponent implements OnInit {
 
   obtenerConfiguracion(): void {
     this.configuracionService.getConfiguracion().subscribe(config => {
-      console.log(config);
-      
-      // Actualizamos los valores en el formulario
       this.form.patchValue({
         monto_reserva: config.monto_reserva,
         monto_asociacion: config.monto_asociacion,
-        porcentaje_senia: config.porcentaje_seña,
+        porcentaje_seña: config.porcentaje_seña,
         descuento_socio: config.descuento_socio,
         monto_paletas: config.monto_paletas,
         monto_pelotas: config.monto_pelotas,
-        stock_paletas: config.stock_paletas,
-        stock_pelotas: config.stock_pelotas,
+        stock_paleta: config.stock_paleta,
+        stock_pelota: config.stock_pelota,
+        duracion_minima_turno: config.duracion_minima_turno,
         duracion_maxima_turno: config.duracion_maxima_turno,
+        horario_inicio_pico: config.horario_inicio_pico,
+        horario_fin_pico: config.horario_fin_pico,
+        monto_x_media_hora: config.monto_x_media_hora,
       });
+
+      this.diasApertura = config.dias_apertura.map(dia => ({
+        ...dia,
+        abierto: dia.horario_inicio !== "00:00:00" && dia.horario_fin !== "00:00:00"
+      }));
+
+      this.originalValues = { ...this.form.value };
     });
   }
   
+  formChanged(): boolean {
+    return this.form.dirty || this.formModificado;
+  }
+
+  actualizarAbierto(index: number, nuevoValor: boolean) {
+    this.diasApertura[index].abierto = nuevoValor;
+    this.formModificado = true;
+  }
+  
+  actualizarHorario(index: number, tipo: 'horario_inicio' | 'horario_fin', nuevoValor: string) {
+    this.diasApertura[index][tipo] = nuevoValor;
+    this.formModificado = true;
+  }
 
   guardarConfiguracion(): void {
     if (this.form.invalid) {
       this.toastrService.error('Por favor, complete todos los campos correctamente.');
       return;
     }
-
+  
+    if (!this.duenioEmail) {
+      this.toastrService.error('No se encontró el email del dueño.');
+      return;
+    }
+  
     const formValues = this.form.value;
-
-    const nuevaConfiguracion = {
-      monto_reserva: formValues.monto_reserva,
-      monto_asociacion: formValues.monto_asociacion,
-      porcentaje_senia : formValues.porcentaje_senia,
-      descuento_socio : formValues.descuento_socio,
-      monto_paletas : formValues.monto_paletas,
-      monto_pelotas: formValues.monto_pelotas,
-      stock_paletas: formValues.stock_paletas,
-      stock_pelotas: formValues.stock_pelotas,
-      duracion_maxima_turno: formValues.duracion_maxima_turno,
+  
+    const nuevaConfiguracion: ConfiguracionGeneral = {
+      id: 1,
+      ...formValues,
+      dias_apertura: this.diasApertura.map(dia => ({
+        id: dia.id,
+        dia: dia.dia,
+        horario_inicio: dia.abierto ? dia.horario_inicio : "00:00:00",
+        horario_fin: dia.abierto ? dia.horario_fin : "00:00:00"
+      }))
     };
-
-    // Enviar al servidor la nueva configuración
-    this.apiService.updateConfiguracion(nuevaConfiguracion).subscribe(
-      response => {
+  
+    console.log("📤 Enviando configuración con email:", this.duenioEmail, nuevaConfiguracion);
+  
+    this.apiService.updateConfiguracion(this.duenioEmail, nuevaConfiguracion).subscribe({
+      next: () => {
         this.toastrService.success('Configuración actualizada con éxito');
+        this.originalValues = { ...this.form.value };
       },
-      error => {
+      error: (error) => {
+        console.error('❌ Error al actualizar la configuración:', error);
         this.toastrService.error('Hubo un error al actualizar la configuración');
       }
-    );
+    });
   }
 
   // Método para sumar más mercadería (stock)
@@ -105,11 +144,11 @@ export class ModificarValoresComponent implements OnInit {
 
     if (tipo === 'pelotas') {
       this.form.patchValue({
-        stockPelotas: this.form.get('stockPelotas')?.value + cantidad
+        stock_pelota: this.form.get('stock_pelota')?.value + cantidad
       });
     } else {
       this.form.patchValue({
-        stockPaletas: this.form.get('stockPaletas')?.value + cantidad
+        stock_paleta: this.form.get('stock_paleta')?.value + cantidad
       });
     }
   }

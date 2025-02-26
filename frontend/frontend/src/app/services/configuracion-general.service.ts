@@ -17,9 +17,9 @@ export interface ConfiguracionGeneral {
   descuento_socio: number;
   monto_paletas: number;
   monto_pelotas: number;
-  stock_pelotas: number;
-  stock_paletas: number;
-  duracion_minima_turno: number;
+  stock_paleta: number;  // Corregido
+  stock_pelota: number;  // Corregido
+  duracion_minima_turno: number; // Agregado
   duracion_maxima_turno: number;
   horario_inicio_pico: string;
   horario_fin_pico: string;

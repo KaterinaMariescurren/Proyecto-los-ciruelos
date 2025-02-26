@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './services/auth.service';
 import { Observable, switchMap, throwError } from 'rxjs';
 
@@ -71,7 +71,7 @@ export interface EmpleadoDTO {
 export class ApiService {
   private apiUrl = 'http://localhost:8080/'; // Reemplaza con tu URL de backend
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   getPerfil(): Observable<any> {
     return this.authService.getUserEmail().pipe(
@@ -96,7 +96,7 @@ export class ApiService {
 
     url += params.join("&");
 
-    return this.http.get<any[]>(url , { responseType: 'json' });
+    return this.http.get<any[]>(url, { responseType: 'json' });
   }
 
   getResrvas(): Observable<any[]> {
@@ -131,15 +131,15 @@ export class ApiService {
       })
     );
   }
-  
+
   getTurnos(): Observable<Reserva[]> {
-    return this.http.get<Reserva[]>(this.apiUrl+"public/consultar_turnos")
+    return this.http.get<Reserva[]>(this.apiUrl + "public/consultar_turnos")
   }
 
   bloquearTurno(turnoDTO: TurnoDTO): Observable<any> {
     // Realizar la solicitud PUT a la API con el token en los headers y el cuerpo en turnoDTO
     return this.http.put<string>(this.apiUrl + 'public/bloquear/turno', turnoDTO);
-  }  
+  }
 
   hacerReserva(reservaDTO: ReservaDTO): Observable<any> {
     return this.authService.getUserEmail().pipe(
@@ -156,13 +156,13 @@ export class ApiService {
 
   registrarUsuario(jugadorDTO: JugadorDTO): Observable<any> {
     const url = `${this.apiUrl}public/registro/jugador`;
-      return this.http.post<any>(url, jugadorDTO);
-    }
+    return this.http.post<any>(url, jugadorDTO);
+  }
 
-    registrarEmpleado(emailUsuario: string, empleadoDTO: EmpleadoDTO): Observable<any> {
-      const url = `${this.apiUrl}public/registro/empleado?email=${encodeURIComponent(emailUsuario)}`;
-      return this.http.post<any>(url, empleadoDTO);
-    }
+  registrarEmpleado(emailUsuario: string, empleadoDTO: EmpleadoDTO): Observable<any> {
+    const url = `${this.apiUrl}public/registro/empleado?email=${encodeURIComponent(emailUsuario)}`;
+    return this.http.post<any>(url, empleadoDTO);
+  }
 
   asociarse(id_mp: number): Observable<any> {
     return this.authService.getUserEmail().pipe(
@@ -175,32 +175,45 @@ export class ApiService {
         return this.http.put<any>(url, null); // Se usa null porque los datos van en la URL, no en el cuerpo
       }));
   }
-  
+
   getUsuarios(): Observable<UsuarioDTO[]> {
-    return this.authService.getUserRole().pipe(
-      switchMap(role => {
-        if (role !== 'admin') {
-          console.error("Acceso denegado: Solo el administrador puede ver los usuarios.");
+    return this.getRol().pipe(
+      switchMap(response => {
+        const rol = response.message;
+        console.log("🔍 Rol obtenido en getUsuarios:", rol);
+
+        if (rol !== 'duenio') {
+          console.error("Acceso denegado: Solo el dueño puede ver los usuarios.");
           return throwError(() => new Error("No autorizado"));
         }
 
-        const url = `${this.apiUrl}private/usuarios`; 
-        return this.http.get<UsuarioDTO[]>(url);
+        return this.authService.getUserEmail().pipe(
+          switchMap(email => {
+            if (!email) {
+              console.error("❌ No se encontró el email del usuario autenticado.");
+              return throwError(() => new Error("Email no disponible"));
+            }
+
+            console.log("📩 Enviando email_usuario en la petición:", email);
+            const url = `${this.apiUrl}public/consultar/usuarios/buscar?email_usuario=${email}`;
+
+            return this.http.get<UsuarioDTO[]>(url);
+          })
+        );
       })
     );
   }
-  
 
   eliminarUsuario(usuarioId: number): Observable<any> {
     const url = `${this.apiUrl}public/eliminar/usuario/${usuarioId}`;
     return this.http.delete<any>(url);
   }
-  
-  updateConfiguracion(nuevaConfiguracion: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}public/configuracion/actualizar`, nuevaConfiguracion);
+
+  updateConfiguracion(email: string, nuevaConfiguracion: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}configuracion_general/public/actualizar_configuracion?email=${email}`, nuevaConfiguracion);
   }
 
-  getRol(): Observable<{ message: string }> { 
+  getRol(): Observable<{ message: string }> {
     return this.authService.getUserEmail().pipe(
       switchMap(email => {
         if (!email) {
@@ -208,7 +221,7 @@ export class ApiService {
           return throwError(() => new Error("No hay usuario autenticado"));
         }
         const url = `${this.apiUrl}public/verificar/empleado?email=${email}`;
-        return this.http.get<{ message: string }>(url); 
+        return this.http.get<{ message: string }>(url);
       })
     );
   }
@@ -220,4 +233,43 @@ export class ApiService {
   getRolFromStorage(): string | null {
     return localStorage.getItem('userRole');
   }
+
+  getUsuariosFiltrados(busqueda: string, filtro: any): Observable<UsuarioDTO[]> {
+    return this.authService.getUserEmail().pipe(
+      switchMap(email => {
+        if (!email) {
+          console.error("❌ No se encontró el email del usuario autenticado.");
+          return throwError(() => new Error("Email no disponible"));
+        }
+
+        let params: any = { email_usuario: email };
+
+        if (busqueda) params.nombre = busqueda; // Enviamos el nombre si hay búsqueda
+        if (filtro.categoria) params.categoria = filtro.categoria;
+        if (filtro.socio) params.socio = filtro.socio;
+        if (filtro.profesor) params.profesor = filtro.profesor;
+
+        console.log("📩 Enviando filtros en la petición:", params);
+
+        const url = `${this.apiUrl}public/consultar/usuarios/buscar`;
+        return this.http.get<UsuarioDTO[]>(url, { params });
+      })
+    );
+  }
+
+  asignarRolProfesor(email: string, jugadorId: number): Observable<any> {
+    const url = `${this.apiUrl}public/jugadores/asignar_profesor/${jugadorId}?email=${encodeURIComponent(email)}`;
+    return this.http.put(url, {}, { responseType: 'text' });
+  }
+
+  asignarRolSocio(email: string, jugadorId: number): Observable<any> {
+    const url = `${this.apiUrl}public/asociar_jugador?id_jugador=${jugadorId}&email=${encodeURIComponent(email)}`;
+    return this.http.put(url, {}, { responseType: 'text' });
+  }
+
+  sacarRolSocio(email: string, jugadorId: number): Observable<any> {
+    const url = `${this.apiUrl}public/desasociar_jugador?id_jugador=${jugadorId}&email=${encodeURIComponent(email)}`;
+    return this.http.put(url, {}, { responseType: 'text' });
+  }
+
 }

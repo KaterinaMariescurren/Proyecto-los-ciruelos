@@ -17,6 +17,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+
 
 // Components
 import { AppComponent } from './app.component';
@@ -101,6 +103,7 @@ import { ReservasDuenioComponent } from './components/shared/reservas-duenio/res
     MatSelectModule,
     NgOptimizedImage,
     MatCheckboxModule,
+    NgxMaterialTimepickerModule,
     BrowserAnimationsModule, // Asegúrate de importar esto
     ToastrModule.forRoot({
       positionClass: 'toast-top-right', // Coloca la notificación arriba a la derecha
