@@ -18,6 +18,8 @@ export class ProcesarPagoComponent {
   senia!: string;
   horario_inicio_ocupado!: string;
   horario_fin_ocupado!: string;
+  cantidad_paletas: number = 0;
+  cantidad_pelotas: number = 0;
   paymentId!: number;
 
   constructor(private route: ActivatedRoute, private router: Router, private api: ApiService, private toastrService: ToastrService) {}
@@ -31,6 +33,8 @@ export class ProcesarPagoComponent {
       this.court = params['court'];
       this.price = params['price'];
       this.senia = params['senia'];
+      this.cantidad_pelotas = params['cantidad_pelotas'];
+      this.cantidad_paletas = params['cantidad_paletas'];
       this.horario_inicio_ocupado = params['horario_inicio_ocupado'];
       this.horario_fin_ocupado = params['horario_fin_ocupado'];
   
@@ -65,7 +69,7 @@ export class ProcesarPagoComponent {
       });
     }else{
       // Determinamos el valor de 'senia' basado en el valor de 'this.senia'
-      const seniaValue = this.senia === "seña" ? true :
+      const seniaValue = this.senia === "seña" ? true : false;
       this.senia === "total" ? false : 
       (() => { throw new Error('Valor de senia no válido'); })();
 

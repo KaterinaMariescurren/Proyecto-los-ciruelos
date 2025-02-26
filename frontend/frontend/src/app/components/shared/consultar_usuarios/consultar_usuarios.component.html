@@ -133,5 +133,17 @@
   </div>
 </div>
 
+<!-- Modal para desasignar rol Profesor -->
+<div class="modal-overlay" *ngIf="mostrarModalDesasignarRolProfesor">
+  <div class="modal-container">
+    <h2>¿Desea desasignarle el rol Profesor?</h2>
+
+    <div class="modal-actions">
+      <button class="modal-btn confirm" (click)="confirmarDesasignarRolProfesor()">Sí</button>
+      <button class="modal-btn cancel" (click)="cerrarModalDesasignarRolProfesor()">No</button>
+    </div>
+  </div>
+</div>
+
 
 

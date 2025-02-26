@@ -120,14 +120,8 @@ export class ApiService {
           return throwError(() => new Error("No hay usuario autenticado"));
         }
 
-        // Objeto con los datos a enviar en el cuerpo
-        const requestBody = {
-          email: encodeURIComponent(email),
-          reservaId: reserva_id
-        };
-
-        const url = `${this.apiUrl}public/cancelar/reserva`;
-        return this.http.put<string>(url, requestBody);
+        const url = `${this.apiUrl}public/cancelar/reserva?email=${encodeURIComponent(email)}&id_reserva=${reserva_id}`;
+        return this.http.put<string>(url, null);
       })
     );
   }
@@ -259,6 +253,11 @@ export class ApiService {
 
   asignarRolProfesor(email: string, jugadorId: number): Observable<any> {
     const url = `${this.apiUrl}public/jugadores/asignar_profesor/${jugadorId}?email=${encodeURIComponent(email)}`;
+    return this.http.put(url, {}, { responseType: 'text' });
+  }
+
+  sacarRolProfesor(email: string, jugadorId: number): Observable<any> {
+    const url = `${this.apiUrl}public/jugadores/desasignar_profesor/${jugadorId}?email=${encodeURIComponent(email)}`;
     return this.http.put(url, {}, { responseType: 'text' });
   }
 

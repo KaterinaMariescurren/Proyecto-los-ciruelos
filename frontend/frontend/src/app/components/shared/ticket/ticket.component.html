@@ -14,6 +14,14 @@
 
             <div class="ticket-item">
                 <span>
+                    <mat-icon class="person-icon">person</mat-icon>
+                    Jugador
+                </span>
+                <span class="ticket-detail">{{ jugador.email }}</span>
+            </div>
+
+            <div class="ticket-item">
+                <span>
                     <mat-icon class="peso-icon">attach_money</mat-icon>
                     Precio
                 </span>
@@ -58,6 +66,14 @@
                 </div>
             </ng-container>
         </div>
-        <div id="wallet_container"></div>    
+
+        <!-- Mostrar botón solo si el rol es "duenio" -->
+        <div *ngIf="rol === 'duenio'" class="button-container">
+            <button mat-raised-button type="submit" class="submit-button" (click)="reservar()">Reservar</button>
+        </div>
+
+        <!-- Solo mostrar el contenedor de Mercado Pago si no es "duenio" -->
+        <div *ngIf="rol !== 'duenio'" id="wallet_container"></div>
+        
     </div>
 </div>

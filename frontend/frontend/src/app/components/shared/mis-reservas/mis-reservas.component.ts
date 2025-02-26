@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { AuthService } from '../../../services/auth.service';
 import { ApiService } from '../../../api.service';
 
@@ -21,7 +21,8 @@ export class MisReservasComponent {
 
   constructor(
     private authService: AuthService,
-    private api: ApiService
+    private api: ApiService,
+    private cdr: ChangeDetectorRef // Importar ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -32,6 +33,7 @@ export class MisReservasComponent {
   obtenerReservas(): void {
     this.api.getResrvas().subscribe((reservas) => {
       this.reservas = reservas;
+      this.cdr.detectChanges(); // Forzar la actualización de la vista
       console.log(reservas)
     });
   }
@@ -39,7 +41,8 @@ export class MisReservasComponent {
   cancelarReserva(reserva_id:number): void {
     console.log(reserva_id);
     this.api.cancelarReserva(reserva_id).subscribe((cancelacion) => {
-      console.log(cancelacion)
+      console.log(cancelacion);
+      this.obtenerReservas();
     });
   }
 

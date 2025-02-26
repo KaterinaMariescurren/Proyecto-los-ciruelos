@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
@@ -12,12 +12,16 @@ import { ApiService } from '../../../api.service';
   styleUrl: './reserva.component.css'
 })
 export class ReservaComponent {
+  rol: string | null = null;
   form!: FormGroup;
   errorMessages: string[] = [];
   pago: 'seña' | 'total' = 'seña'; // Estado del pago
   precio: number = 0; 
   precioPelota = 500;
   precioPaleta = 1500; 
+
+  jugadorSeleccionado: any = null;
+  usuariosFiltrados: any[] = [];
 
   date!: string;
   court!: string;
@@ -37,6 +41,7 @@ export class ReservaComponent {
     private api: ApiService,  
     private toastrService: ToastrService,
     private configuracionService: ConfiguracionService,
+    private cdRef: ChangeDetectorRef,
   ) {
     this.api.getPerfil().subscribe((perfil) => {
       console.log(perfil.socio);
@@ -50,10 +55,28 @@ export class ReservaComponent {
     this.form = this.formBuilder.group({
       pelotas: [0, [Validators.required, Validators.min(0)]], 
       paletas: [0, [Validators.required, Validators.min(0)]],
+      jugadorSeleccionado: [null, [Validators.required]], // Agregar esta línea
     });
 
-    this.obtenerConfiguracion();
+    this.api.getRol().subscribe({
+      next: (data: any) => {
+        this.rol = data.message; 
+        this.obtenerUsuarios();
+        console.log("Rol obtenido:", this.rol); // <-- Agrega este log
+        this.cdRef.detectChanges();
 
+        this.obtenerConfiguracion();
+        // Escuchar cambios en el formulario para actualizar el precio
+        this.form.valueChanges.subscribe(() => {
+          this.calcularPrecio();
+        });
+
+      },
+      error: (err) => {
+        this.rol = 'none';
+        console.error("Error al obtener el rol:", err);
+      }
+    });
     this.route.queryParams.subscribe(params => {
       this.date = params['fecha'];
       this.court = params['id_cancha'];
@@ -65,8 +88,30 @@ export class ReservaComponent {
     this.form.valueChanges.subscribe(() => {
       this.calcularPrecio();
     });
-
   }
+
+  obtenerUsuarios(): void {
+    if (this.rol === 'duenio') {
+      this.api.getUsuarios().subscribe({
+        next: (usuarios) => {
+          console.log("Usuarios obtenidos del backend:", usuarios);
+          
+          // Filtrar solo los jugadores (sin rol de dueño)
+          this.usuariosFiltrados = usuarios.filter(usuario => !('duenio' in usuario));
+          console.log("Usuarios filtrados (solo jugadores):", this.usuariosFiltrados);
+        },
+        error: (err) => {
+          console.error("Error al obtener usuarios:", err);
+        }
+      });
+    }
+  }
+
+  // Agregar un método que permita seleccionar un jugador
+  seleccionarJugador(): void {
+    this.calcularPrecio();
+  }
+
 
   obtenerConfiguracion(): void {
     // Primero revisamos si ya tenemos la configuración almacenada
@@ -96,15 +141,24 @@ export class ReservaComponent {
     if (this.configuracion) {
       const pelotas = this.form.get('pelotas')?.value || 0;
       const paletas = this.form.get('paletas')?.value || 0;
+      const jugadorSeleccionado = this.form.get('jugadorSeleccionado')?.value;
       let precioBase = (pelotas * this.precioPelota) + (paletas * this.precioPaleta) + this.configuracion?.monto_reserva;
-  
-      if (this.pago === "seña") {
-        this.precio = precioBase * this.configuracion.porcentaje_seña;
-      } else {
-        this.precio = precioBase;
+      
+      if (this.rol==="duenio"){
+        this.precio=precioBase;
+        if (this.jugadorSeleccionado && this.jugadorSeleccionado.socio) {
+          
+        }
+
+      }else{
+        if (this.pago === "seña") {
+          this.precio = precioBase * this.configuracion.porcentaje_seña;
+        } else {
+          this.precio = precioBase;
+        }
       }
-  
-      if (this.isSocio) {
+
+      if (this.isSocio || (jugadorSeleccionado && jugadorSeleccionado.socio)) {
         this.precio -= this.configuracion.monto_reserva*this.configuracion.descuento_socio;
       }
   
@@ -121,8 +175,14 @@ export class ReservaComponent {
     const formValues = this.form.value;
     console.log("Pelotas:", formValues.pelotas);
     console.log("Paletas:", formValues.paletas);
-    console.log("Pago:", this.pago);
     console.log("Precio total:", this.precio);
+
+    if (this.rol === "duenio"){
+      this.jugadorSeleccionado = this.form.get('jugadorSeleccionado')?.value;
+      this.pago="total";
+      console.log("Pago:", this.pago);
+      console.log("Jugador seleccionado:", this.jugadorSeleccionado.email);
+    }
 
     this.router.navigate(['/ticket'], {
       queryParams: {
@@ -130,9 +190,13 @@ export class ReservaComponent {
         fecha: this.date,
         horario_inicio_ocupado: this.horario_inicio_ocupado,
         horario_fin_ocupado: this.horario_fin_ocupado,
+        cantidad_paletas: formValues.paletas,
+        cantidad_pelotas: formValues.pelotas,
         precio: this.precio,
         senia: this.pago,
+        jugador: JSON.stringify(this.jugadorSeleccionado) 
       }
     });  
   }
+  
 }

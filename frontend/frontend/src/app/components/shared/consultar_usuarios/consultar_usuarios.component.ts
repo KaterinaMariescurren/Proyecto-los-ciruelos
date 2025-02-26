@@ -121,7 +121,9 @@ export class ConsultarUsuariosComponent {
   accionModal = '';
   usuarioSeleccionado: any;
   mostrarModalDesasociar = false;
+  mostrarModalDesasignarRolProfesor = false;
   usuarioSeleccionadoDesasociar: any;
+  usuarioSeleccionadoDesAsignarRolProfesor: any;
 
   /**
    * Abre el modal para asignar rol de socio o profesor
@@ -172,6 +174,15 @@ export class ConsultarUsuariosComponent {
     this.mostrarModalDesasociar = true;
   }
 
+  cerrarModalDesasignarRolProfesor() {
+    this.mostrarModalDesasignarRolProfesor = false;
+  }
+
+  abrirModalDesasignarRolProfesor(usuario: any) {
+    this.usuarioSeleccionadoDesAsignarRolProfesor = usuario;
+    this.mostrarModalDesasignarRolProfesor = true;
+  }
+
   cerrarModalDesasociar() {
     this.mostrarModalDesasociar = false;
   }
@@ -201,4 +212,31 @@ export class ConsultarUsuariosComponent {
       this.cerrarModalDesasociar();
     });
   }
+
+  confirmarDesasignarRolProfesor() {
+    if (!this.usuarioSeleccionadoDesAsignarRolProfesor) return;
+
+    this.authService.getUserEmail().subscribe((duenioEmail) => {
+      if (!duenioEmail) {
+        this.toastrService.error('No se pudo obtener el email del dueño', 'Error');
+        return;
+      }
+
+      this.apiService.sacarRolProfesor(duenioEmail, this.usuarioSeleccionadoDesAsignarRolProfesor.id).subscribe({
+        next: () => {
+          this.toastrService.success(`El usuario ${this.usuarioSeleccionadoDesAsignarRolProfesor.nombre} ha sido desasociado`);
+          this.obtenerUsuarios();
+        },
+        error: () => {
+          this.toastrService.error('Error al desasociar el jugador', 'Error');
+        }
+      });
+
+      this.cerrarModalDesasociar();
+    });
+  }
+
 }
+
+
+
