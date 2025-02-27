@@ -3,8 +3,10 @@ package Grupo11.Seminario.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import Grupo11.Seminario.Entities.Empleado;
 import Grupo11.Seminario.Repository.IEmpleadoRepository;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -30,5 +32,9 @@ public class EmpleadoService {
 
     public Boolean verificar_duenio(Integer id_empleado){
         return i_empleado_repository.findById(id_empleado).get().getDuenio();
+    }
+
+    public Optional<Empleado> buscarPorEmail(String email) {
+        return i_empleado_repository.findByEmail(email).stream().findFirst();
     }
 }

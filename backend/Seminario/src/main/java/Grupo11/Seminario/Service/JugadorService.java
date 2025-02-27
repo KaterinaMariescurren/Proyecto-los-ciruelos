@@ -42,4 +42,18 @@ public class JugadorService {
         }
         return false;
     }
+
+    // Quitar rol de profesor a un jugador
+    public Boolean desasignar_rol_profesor(Integer jugador_id) {
+        Jugador jugador = i_jugador_repository.findById(jugador_id).orElse(null);
+        if (jugador != null) {
+            if (!jugador.getProfesor()) {
+                return false;
+            }
+            jugador.setProfesor(false);  // Asigna el rol de profesor
+            i_jugador_repository.save(jugador);  // Actualiza la base de datos
+            return true;
+        }
+        return false;
+    }
 }

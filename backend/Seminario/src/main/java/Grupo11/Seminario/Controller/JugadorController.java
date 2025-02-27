@@ -3,7 +3,6 @@ package Grupo11.Seminario.Controller;
 import Grupo11.Seminario.Service.EmpleadoService;
 import Grupo11.Seminario.Service.JugadorService;
 import Grupo11.Seminario.Service.UsuarioService;
-import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -44,5 +43,27 @@ public class JugadorController {
         }
         return ResponseEntity.badRequest().body("El usuario no es un empleado");
     }
+
+        // Quitar rol de profesor a un jugador
+    @PutMapping("/desasignar_profesor/{jugador_id}")
+    public ResponseEntity<String> desasignarRolProfesor(@RequestParam String email ,@PathVariable Integer jugador_id) {
+        Boolean exito = jugadorService.desasignar_rol_profesor(jugador_id); 
+
+        Integer duenio_id = usuarioService.buscar_usuario(email).get().getId();
+        if (empleadoService.existe_empleado(duenio_id)) {
+            Boolean vduenio = empleadoService.verificar_duenio(duenio_id);
+            if (vduenio) {
+            
+                if (exito) {
+                    return ResponseEntity.ok("Rol de profesor eliminado exitosamente del jugador.");
+                } else {
+                    return ResponseEntity.badRequest().body("Error al quitar el rol de profesor.");
+                }
+            }
+            return ResponseEntity.badRequest().body("Error al verificar que se sea un dueño");   
+        }
+        return ResponseEntity.badRequest().body("El usuario no es un empleado");
+    }
+
 }
 

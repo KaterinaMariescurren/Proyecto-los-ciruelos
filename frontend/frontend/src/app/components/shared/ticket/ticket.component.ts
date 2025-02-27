@@ -1,8 +1,10 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfiguracionGeneral, ConfiguracionService } from '../../../services/configuracion-general.service';
 import { MercadopagoService } from '../../../services/mercadopago.service';
 import { AuthService } from '../../../services/auth.service';
+import { ApiService, ReservaDTO } from '../../../api.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-ticket',
@@ -15,10 +17,14 @@ export class TicketComponent {
   date!: string;
   court?: string;
   price!: number;
-  senia?: string;
-  horario_inicio_ocupado?: string;
-  horario_fin_ocupado?: string;
+  cantidad_paletas: number = 0;
+  cantidad_pelotas: number = 0;
+  senia: string = "";
+  jugador?: any
+  horario_inicio_ocupado: string = "";
+  horario_fin_ocupado: string = "";
   informacion!: string;
+  rol: string | null = null;
 
   configuracion: ConfiguracionGeneral | null = null;
 
@@ -28,9 +34,25 @@ export class TicketComponent {
     private configuracionService: ConfiguracionService,
     private mercadopagoService: MercadopagoService,
     private authService: AuthService,
+    private api: ApiService,  
+    private cdRef: ChangeDetectorRef,
+    private toastrService: ToastrService
+    
   ) { }
 
   ngOnInit(): void {
+    this.api.getRol().subscribe({
+      next: (data: any) => {
+        this.rol = data.message; 
+        console.log("Rol obtenido:", this.rol); // <-- Agrega este log
+        this.cdRef.detectChanges();
+
+      },
+      error: (err) => {
+        this.rol = 'none';
+        console.error("Error al obtener el rol:", err);
+      }
+    });
 
     this.configuracion = this.configuracionService.getStoredConfiguracion();
 
@@ -61,12 +83,16 @@ export class TicketComponent {
 
       if (!this.esAsociacion) {
         this.date = params['fecha'];
+        this.cantidad_pelotas = params['cantidad_pelotas'];
+        this.cantidad_paletas = params['cantidad_paletas'];
         this.court = params['id_cancha'];
         this.senia = params['senia'];
         this.price = params['precio'];
         this.horario_inicio_ocupado = params['horario_inicio_ocupado'];
         this.horario_fin_ocupado = params['horario_fin_ocupado'];
         this.informacion = 'Detalles sobre la cancha';
+        this.jugador = JSON.parse(params['jugador']); 
+        console.log(this.jugador);
       }
 
       // Verificar si el usuario está autenticado antes de proceder con el pago
@@ -163,5 +189,37 @@ export class TicketComponent {
         }
       },
     });
+  }
+
+  reservar(): void {
+    const seniaValue = this.senia === "seña" ? true : false;
+    this.senia === "total" ? false : 
+    (() => { throw new Error('Valor de senia no válido'); })();
+    if (this.rol === "duenio"){
+      const reservaDTO: ReservaDTO = {
+        cantidad_pelotas: this.cantidad_paletas,
+        cantidad_paletas: this.cantidad_pelotas,
+        fecha: this.date, // Formato ISO-8601: 'yyyy-MM-dd'
+        horario_inicio: this.horario_inicio_ocupado,  // Formato ISO-8601: 'HH:mm:ss'
+        horario_fin: this.horario_fin_ocupado, // Formato ISO-8601: 'HH:mm:ss'
+        numero_cancha: Number(this.court),
+        id_reservador: this.jugador.id,
+        senia: seniaValue,  // Asignamos el valor de 'senia' basado en la condición
+        id_mp: 0,
+      };
+      this.api.hacerReserva(reservaDTO).subscribe({
+        next: (response) => {
+          // Si la respuesta es exitosa, redirige a la página de ticket
+          console.log('Respuesta de la API:', response); // Verifica que la respuesta sea correcta
+          this.router.navigate(['/home']);
+          this.toastrService.success('Se reservo el turno con exito.', 'Reserva');
+        },
+        error: (err) => {
+          // Si ocurre algún error en el bloqueo, muestra un mensaje de error
+          console.error('Error al reservar el turno', err);
+          this.toastrService.error('Hubo un error al reservar el turno.', 'Error');
+        }
+      });
+    }
   }
 }

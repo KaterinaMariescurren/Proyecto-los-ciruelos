@@ -43,9 +43,10 @@ public class AsociacionController {
     UsuarioService usuarioService;
     
     @PutMapping(path = "/asociar_jugador")
-    public ResponseEntity<?> asociar_jugador(@RequestParam String email ,HttpServletRequest request, @RequestBody AsociacionDTO asociacionDTO) throws JsonMappingException, JsonProcessingException{
+    public ResponseEntity<?> asociar_jugador(@RequestParam String email , @RequestParam Integer id_jugador) throws JsonMappingException, JsonProcessingException{
     
         Integer id_duenio = usuarioService.buscar_usuario(email).get().getId();
+        ConfiguracionGeneral configuracion_general = configuracion_general_service.get_configuracion_general();
 
         // Se busca si existe el empleado
         if (asociacion_service.existe_empleado(id_duenio) ){
@@ -53,50 +54,23 @@ public class AsociacionController {
             // Se verifica que sea un dueño
             if (asociacion_service.verificar_duenio(id_duenio)) {
 
-                if (asociacion_service.existe_jugador(asociacionDTO.getId_jugador())) {
+                if (asociacion_service.existe_jugador(id_jugador)) {
                     // Se verifica que el jugador no este asociado
-                    if (asociacion_service.verificar_asociacion(asociacionDTO.getId_jugador())) {
-                        ResponseEntity<String> response = pago_service.buscar_pago(asociacionDTO.getId_pago());
+                    if (asociacion_service.verificar_asociacion(id_jugador)) {
+                        Jugador jugador = asociacion_service.buscar_jugador(id_jugador);
+                        Empleado duenio = asociacion_service.buscar_empleado(id_duenio);
+                        
+                        Asociacion asociacion = new Asociacion();
+                        asociacion.setFecha(LocalDate.now());
+                        asociacion.setHora(LocalTime.now());
+                        asociacion.setPrecio(configuracion_general.getMonto_asociacion());
+    
+                        jugador.setSocio(true);
+                        asociacion.setJugador(jugador);
+                        asociacion.setDuenio(duenio);
 
-                        // Se valida que este realizado el pago
-                        if (response.getStatusCode() == HttpStatus.OK) {
-                            Jugador jugador = asociacion_service.buscar_jugador(asociacionDTO.getId_jugador());
-                            jugador.setSocio(true);
-
-                            Empleado duenio = asociacion_service.buscar_empleado(id_duenio);
-                            ConfiguracionGeneral configuracion_general = configuracion_general_service.get_configuracion_general();
-                            PagoMercadoPagoDTO pago_mpDTO = pago_service.pagar(response);
-    
-                            Cuenta cuenta = new Cuenta();
-                            cuenta.setEmail(pago_mpDTO.getEmail_pagador());
-                            cuenta.setApellido(pago_mpDTO.getApellido_pagador());
-                            cuenta.setNombre(pago_mpDTO.getNombre_pagador());
-                            cuenta.setTipo_identificacion(pago_mpDTO.getTipo_identificacion());
-                            cuenta.setNumero_identificacion(pago_mpDTO.getNumero_identificacion());
-    
-                            Pago pago = new Pago();
-                            pago.setFecha(pago_mpDTO.getFecha());
-                            pago.setHora(pago_mpDTO.getHora());
-                            pago.setMetodo(pago_mpDTO.getMetodo_pago());
-                            pago.setMotivo(pago_mpDTO.getMotivo());
-                            pago.setEstado(pago_mpDTO.getEstado());
-                            pago.setCuenta(cuenta);
-                            pago.setMonto(configuracion_general.getMonto_asociacion());
-                            pago.setDescuento(0f);
-    
-                            Asociacion asociacion = new Asociacion();
-                            asociacion.setFecha(LocalDate.now());
-                            asociacion.setHora(LocalTime.now());
-                            asociacion.setPrecio(configuracion_general.getMonto_asociacion());
-    
-                            asociacion.setJugador(jugador);
-                            asociacion.setDuenio(duenio);
-                            asociacion.setPago(pago);
-    
-                            asociacion_service.guardar_asociacion(asociacion);
-                            return ResponseEntity.ok().body("Asociacion Exitosa");
-                        }   
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontro el pago");
+                        asociacion_service.guardar_asociacion(asociacion);
+                        return ResponseEntity.ok().body("Asociacion Exitosa");
                     }
                     return ResponseEntity.badRequest().body("El jugador ya es un socio");
                 }
@@ -180,6 +154,31 @@ public class AsociacionController {
             return ResponseEntity.badRequest().body("El jugador no está asociado");
         }
         return ResponseEntity.badRequest().body("No existe el jugador");
+    }
+
+    @PutMapping(path = "/desasociar_jugador")
+    public ResponseEntity<?> desasociarse(@RequestParam String email , @RequestParam Integer id_jugador) {
+        Integer id_duenio = usuarioService.buscar_usuario(email).get().getId();
+        // Se busca si existe el empleado
+        if (asociacion_service.existe_empleado(id_duenio) ){
+
+            // Se verifica que sea un dueño
+            if (asociacion_service.verificar_duenio(id_duenio)) {
+                if (asociacion_service.existe_jugador(id_jugador)) {
+                    // Verificar si el jugador está asociado
+                    if (!asociacion_service.verificar_asociacion(id_jugador)) {
+                        Jugador jugador = asociacion_service.buscar_jugador(id_jugador);
+                        jugador.setSocio(false);
+                        asociacion_service.guardar_jugador(jugador);
+                        return ResponseEntity.ok().body("Desasociado con éxito");
+                    }
+                    return ResponseEntity.badRequest().body("El jugador no está asociado");
+                }
+                return ResponseEntity.badRequest().body("No existe el jugador");
+            }
+            return ResponseEntity.badRequest().body("No tiene los permisos para esta accion");
+        }
+        return ResponseEntity.badRequest().body("No se encontro el empleado");
     }
 }
 

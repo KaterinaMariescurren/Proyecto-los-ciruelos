@@ -54,7 +54,7 @@ public class Reserva {
     private Turno turno;
 
     @ManyToOne()
-    @JoinColumn(nullable = false, name = "jugador_id")
+    @JoinColumn(nullable = true, name = "jugador_id")
     private Jugador jugador;
 
     @ManyToOne()

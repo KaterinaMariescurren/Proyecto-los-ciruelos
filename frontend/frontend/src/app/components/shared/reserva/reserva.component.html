@@ -1,4 +1,4 @@
-<div class="form">
+<div *ngIf="rol !== 'duenio'"class="form">
   <div class="form__container">
     <h1>Reserva</h1>
 
@@ -51,6 +51,64 @@
         <ng-container *ngFor="let error of errorMessages">
           <div>{{ error }}</div>
         </ng-container>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Si el rol es "dueño" y hay jugadores seleccionados -->
+<div *ngIf="rol === 'duenio'" class="form">
+  <div class="form__container">
+    <h1>Reserva</h1>
+
+    <form [formGroup]="form" (ngSubmit)="next()" novalidate>
+      <!-- Selección del jugador -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Seleccionar Jugador</mat-label>
+          <mat-select formControlName="jugadorSeleccionado">
+            <mat-option *ngFor="let jugador of usuariosFiltrados" [value]="jugador">
+              {{ jugador.nombre }} {{jugador.apellido}} ({{ jugador.email }})
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="!jugadorSeleccionado">
+            Este campo es obligatorio.
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Paletas y Pelotas -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Paletas</mat-label>
+          <input matInput formControlName="paletas" type="number" aria-label="Paletas" />
+          <mat-error *ngIf="form.get('paletas')?.touched && form.get('paletas')?.hasError('required')">
+            Este campo es obligatorio.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Pelotas</mat-label>
+          <input matInput formControlName="pelotas" type="number" aria-label="Pelotas" />
+          <mat-error *ngIf="form.get('pelotas')?.touched && form.get('pelotas')?.hasError('required')">
+            Este campo es obligatorio.
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Campo de precio -->
+      <div class="price-container">
+          <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Precio Total</mat-label>
+          <input matInput [value]="precio" readonly aria-label="Precio Total" />
+          </mat-form-field>
+      </div>
+
+      <!-- Botón de registro -->
+      <div class="register-button">
+          <button mat-raised-button type="submit" class="submit-button">
+          Siguiente
+          </button>
       </div>
     </form>
   </div>

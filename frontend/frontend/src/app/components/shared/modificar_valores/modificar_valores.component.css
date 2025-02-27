@@ -1,0 +1,124 @@
+/* Contenedor principal */
+.home-sidebar {
+    min-height: 100vh;
+    margin-left: 20%;
+    padding: 20px;
+}
+
+/* Formulario */
+.form__container {
+    max-width: 800px;
+    padding: 20px;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 15px;
+}
+
+/* Filas del formulario */
+.form-row {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+}
+
+mat-form-field {
+    width: 100%;
+    min-width: 120px;
+    margin-bottom: 15px;
+}
+
+mat-label {
+    font-size: 1.1em;
+}
+
+/* Inputs */
+input {
+    font-size: 1em;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s;
+    width: 100%;
+}
+
+mat-error {
+    color: #f44336;
+    font-size: 0.9em;
+}
+
+/* Botón de guardar */
+.register-button {
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    background: var(--button-color-primary);
+    color: var(--text);
+    font-size: 1em;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+button:disabled {
+    cursor: not-allowed;
+    background: #bdbcbc;
+    color: white;
+}
+
+/* Tabla */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: fixed; /* Columnas más compactas */
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+table th {
+    background: #e5e7eb;
+    font-size: 16px;
+}
+
+/* Ajuste de inputs en la tabla */
+table input[type="time"] {
+    width: 100px;
+    padding: 3px;
+    font-size: 14px;
+}
+
+mat-select {
+    width: 100%;
+    min-width: 100px;
+}
+
+/* Responsividad para móviles */
+@media screen and (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    table th, table td {
+        padding: 6px;
+        font-size: 12px;
+    }
+}

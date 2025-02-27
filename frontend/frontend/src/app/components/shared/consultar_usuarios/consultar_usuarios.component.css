@@ -1,0 +1,224 @@
+.container {
+    margin-left: 20%;
+    padding: 30px;
+
+}
+
+/* ----- Header  ----- */
+.header {
+    margin: 0 auto; /* Centra el header */
+    display: flex;
+    justify-content: space-between; /* Alinea el título a la izquierda y el botón a la derecha */
+    align-items: center; /* Centra verticalmente */
+    padding: 10px 0px;
+    background-color: white;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.header .titulo {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.new-player-btn {
+    margin-right: 20px;
+    background-color: #28a745;
+    color: white;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+}
+
+.new-player-btn:hover {
+    background-color: #218838;
+}
+
+/* ----- Estilos de los Filtros ----- */
+.filter-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.filter-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+/* ----- Estilos de la Tabla ----- */
+.table-container {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+/* Tabla */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Encabezados de la tabla */
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #ddd;
+}
+
+/* Celdas */
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Colores para las celdas de "Socio" y "Profesor" */
+.yes {
+    background: #d4f8d4;
+    padding: 5px 10px;
+    border-radius: 8px;
+    color: green;
+    font-weight: bold;
+}
+
+.no {
+    background: #f8d4d4;
+    padding: 5px 10px;
+    border-radius: 8px;
+    color: red;
+    font-weight: bold;
+}
+
+/* Botón de eliminar */
+button.mat-icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+/* Sombra en la tabla */
+.mat-elevation-z2 {
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Contenedor del botón */
+.btn-container {
+    display: flex;
+    align-items: center;
+}
+
+.yes {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .no {
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .no:hover {
+    color: darkred;
+  }
+
+  /* Fondo oscuro detrás del modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* Contenedor del modal */
+  .modal-container {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    width: 350px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.2s ease-in-out;
+  }
+  
+  /* Título del modal */
+  .modal-container h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  /* Contenedor de botones */
+  .modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  
+  /* Botón del modal */
+  .modal-btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  /* Botón "Sí" */
+  .modal-btn.confirm {
+    background-color: #c4edd6;
+    color: black;
+  }
+  
+  /* Botón "No" */
+  .modal-btn.cancel {
+    background-color: #85ddb8;
+    color: white;
+  }
+  
+  /* Efecto hover */
+  .modal-btn:hover {
+    opacity: 0.8;
+  }
+  
+  /* Animación de aparición */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  

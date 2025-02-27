@@ -15,12 +15,12 @@ import {
   sendEmailVerification,
   fetchSignInMethodsForEmail,
 } from '@angular/fire/auth';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { applyActionCode, getAuth, getRedirectResult, onAuthStateChanged, signInWithRedirect, signOut } from 'firebase/auth';
-
+import { HttpClient, HttpParams } from '@angular/common/http';  // Importamos HttpClient para las solicitudes HTTP
 
 export interface Credential {
   email: string;
@@ -35,6 +35,7 @@ export class AuthService {
   private router: Router = inject(Router);
   private user: User | null = null;
   readonly authState$: Observable<User | null> = authState(this.auth);
+  private http: HttpClient = inject(HttpClient); // Inyectamos HttpClient
 
   constructor(private fb: FormBuilder, private toastrService: ToastrService) {
     onAuthStateChanged(this.auth, (user) => {
@@ -47,8 +48,8 @@ export class AuthService {
     return !!localStorage.getItem('user');  // Verifica si el usuario está en localStorage
   }
 
-   // Método para hacer logout
-   logout(): Promise<void> {
+  // Método para hacer logout
+  logout(): Promise<void> {
     return signOut(this.auth)
       .then(() => {
         localStorage.removeItem('user'); // Elimina el usuario de localStorage al cerrar sesión
@@ -60,16 +61,16 @@ export class AuthService {
         throw error;  // Lanza error si ocurre algún problema al hacer logout
       });
   }
-  
+
   async updatePassword(newPassword: string): Promise<void> {
     const user = this.auth.currentUser;
     if (user) {
-      return updatePassword(user, newPassword); 
+      return updatePassword(user, newPassword);
     } else {
       throw new Error('No hay usuario autenticado');
     }
   }
-  
+
   registerWithEmailAndPassword(credential: Credential): Promise<UserCredential> {
     return createUserWithEmailAndPassword(this.auth, credential.email, credential.password)
       .then(async (userCredential) => {
@@ -77,20 +78,20 @@ export class AuthService {
           this.enviarEmailVerification(userCredential);
         }
         return userCredential;
-      })  
+      })
       .catch(error => {
         throw error;
       });
   }
-  
+
   async verifyEmailWithCode(oobCode: string): Promise<void> {
     const auth = getAuth();
     try {
-      await applyActionCode(auth, oobCode); 
+      await applyActionCode(auth, oobCode);
       console.log('Correo electrónico verificado');
     } catch (error) {
       console.error('Error al verificar el correo electrónico:', error);
-      throw error; 
+      throw error;
     }
   }
 
@@ -101,7 +102,7 @@ export class AuthService {
         if (!userCredential.user?.emailVerified) {
           // Enviar nuevamente el correo de verificación
           sendEmailVerification(userCredential.user);
-          
+
           // Lanzar un error con el código 'auth/email-not-verified'
           const error: any = new Error('Correo no verificado');
           error.code = 'auth/email-not-verified'; // Definir el código de error Firebase
@@ -110,7 +111,7 @@ export class AuthService {
         localStorage.setItem('user', JSON.stringify(this.user)); // Guarda el usuario en localStorage
 
         this.toastrService.success("Bienvenido de nuevo! Nos alegra verte otra vez.", "Exito");
-  
+
         return userCredential;
       })
       .catch((error) => {
@@ -126,28 +127,28 @@ export class AuthService {
     }
     throw new Error('No hay usuario conectado');
   }
-  
+
   async loginWithGoogleProvider(): Promise<UserCredential> {
     const provider = new GoogleAuthProvider();
-  
+
     try {
       localStorage.setItem('user', JSON.stringify(this.user)); // Guarda el usuario en localStorage
       return await signInWithPopup(this.auth, provider);
-      
+
     } catch (error: any) {
       return error;
     }
-  }  
+  }
 
   async enviarEmailVerification(userCredential: UserCredential): Promise<void> {
     const user = userCredential.user;
     if (user && !user.emailVerified) {
       try {
         const actionCodeSettings = {
-          url: 'https://proyecto-los-ciruelos.firebaseapp.com/__/auth/action',  
+          url: 'https://proyecto-los-ciruelos.firebaseapp.com/__/auth/action',
           handleCodeInApp: true,
         };
-      
+
         await sendEmailVerification(user, actionCodeSettings);
         this.toastrService.info("Correo de verificación enviado. Revisa tu correo electronico.", "Verificación requerida");
       } catch (error) {
@@ -165,12 +166,35 @@ export class AuthService {
 
   getUserEmail(): Observable<string | null> {
     return this.authState$.pipe(
-      map((user) => user?.email || null) // Si el usuario está autenticado, devuelve el email; si no, devuelve null
+      map((user) => user?.email || null)
     );
   }
 
   getUsuario(): Observable<User | null> {
-    return this.authState$; // Devuelve el estado actual del usuario autenticado
+    return this.authState$;
+  }
+
+
+  getUserRole(): Observable<string | null> {
+    return this.authState$.pipe(
+      tap(user => console.log("🔍 Usuario autenticado en authState$:", user)), // <-- Agregar log aquí
+      switchMap((user) => {
+        if (!user) {
+          console.warn("⚠️ No hay usuario autenticado, retornando null");
+          return of(null);
+        }
+  
+        return this.http.get<{ message: string }>(`/public/verificar/empleado?email=${user.email}`).pipe(
+          tap(response => console.log("📢 Respuesta del backend:", response)), // <-- Verifica la respuesta del backend
+          map((response) => response.message),
+          catchError(error => {
+            console.error("⛔ Error al obtener el rol:", error);
+            return of(null);
+          })
+        );
+      })
+    );
   }
   
+
 }

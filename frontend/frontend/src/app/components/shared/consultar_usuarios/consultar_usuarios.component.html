@@ -1,0 +1,134 @@
+<div class="container">
+  <!-- Filtros -->
+  <div class="filter-card">
+    <div class="filter-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Buscar</mat-label>
+        <input matInput [(ngModel)]="busqueda" (change)="filtrarUsuarios()">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Categoría</mat-label>
+        <mat-select [(ngModel)]="filtro.categoria" (selectionChange)="filtrarUsuarios()">
+          <mat-option value="">Todas</mat-option>
+          <mat-option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="filter-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Socio</mat-label>
+        <mat-select [(ngModel)]="filtro.socio" (selectionChange)="filtrarUsuarios()">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="Si">Sí</mat-option>
+          <mat-option value="No">No</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Profesor</mat-label>
+        <mat-select [(ngModel)]="filtro.profesor" (selectionChange)="filtrarUsuarios()">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="Si">Sí</mat-option>
+          <mat-option value="No">No</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="filter-actions">
+      <button mat-button color="warn" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+  </div>
+
+  <!-- Encabezado de la Tabla -->
+  <div class="header">
+    <h2>Jugador</h2>
+    <div class="btn-container">
+      <button class="new-player-btn">+ Nuevo Jugador</button>
+    </div>
+  </div>
+
+  <!-- Tabla de jugadores -->
+  <div class="table-container">
+    <table mat-table [dataSource]="usuariosFiltrados" class="mat-elevation-z2">
+
+      <!-- Columnas -->
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef> Nombre </th>
+        <td mat-cell *matCellDef="let usuario"> {{ usuario.nombre }} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef> Email </th>
+        <td mat-cell *matCellDef="let usuario"> {{ usuario.email }} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="categoria">
+        <th mat-header-cell *matHeaderCellDef> Categoría </th>
+        <td mat-cell *matCellDef="let usuario"> {{ usuario.categoria }} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="socio">
+        <th mat-header-cell *matHeaderCellDef> Socio </th>
+        <td mat-cell *matCellDef="let usuario">
+          <span [ngClass]="{'yes': usuario.socio, 'no': !usuario.socio}"
+            (click)="usuario.socio ? abrirModalDesasociar(usuario) : abrirModal(usuario, 'socio')"
+            style="cursor: pointer;">
+            {{ usuario.socio ? 'Sí' : 'No' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="profesor">
+        <th mat-header-cell *matHeaderCellDef> Profesor </th>
+        <td mat-cell *matCellDef="let usuario">
+          <span [ngClass]="{'yes': usuario.profesor, 'no': !usuario.profesor}"
+            (click)="usuario.profesor ? abrirModalDesasignarRolProfesor(usuario) : abrirModal(usuario, 'profesor')"
+            style="cursor: pointer;">
+            {{ usuario.profesor ? 'Sí' : 'No' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="mostrarModal">
+  <div class="modal-container">
+    <h2>¿Desea hacerlo {{ accionModal === 'profesor' ? 'Profesor' : 'Socio' }}?</h2>
+
+    <div class="modal-actions">
+      <button class="modal-btn confirm" (click)="confirmarAccion()">Sí</button>
+      <button class="modal-btn cancel" (click)="cerrarModal()">No</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Desasociar Socio -->
+<div class="modal-overlay" *ngIf="mostrarModalDesasociar">
+  <div class="modal-container">
+    <h2>¿Desea desasociar a este jugador?</h2>
+
+    <div class="modal-actions">
+      <button class="modal-btn confirm" (click)="confirmarDesasociacion()">Sí</button>
+      <button class="modal-btn cancel" (click)="cerrarModalDesasociar()">No</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para desasignar rol Profesor -->
+<div class="modal-overlay" *ngIf="mostrarModalDesasignarRolProfesor">
+  <div class="modal-container">
+    <h2>¿Desea desasignarle el rol Profesor?</h2>
+    <div class="modal-actions">
+      <button class="modal-btn confirm" (click)="confirmarDesasignarRolProfesor()">Sí</button>
+      <button class="modal-btn cancel" (click)="cerrarModalDesasignarRolProfesor()">No</button>
+    </div>
+  </div>
+</div>

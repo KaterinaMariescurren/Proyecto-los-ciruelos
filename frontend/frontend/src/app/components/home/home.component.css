@@ -1,11 +1,9 @@
-
-
     /* Fondo para la sección "Bienvenidos" hasta el calendario */
     .encabezado {
         position: relative;
         display: flex;
         justify-content: center;
-        align-items: center; 
+        align-items: center;
         padding: 60px 20px;
         min-height: 100vh;
         background-image: url('../../assets/images/john-fornander-y6_SJpU3Alk-unsplash.jpg');
@@ -29,7 +27,7 @@
         animation: slideIn 1s ease-out;
     }
 
-    .home_header .description {
+    .home_header h2 {
         font-size: 2rem;
         margin: 30px 0;
         font-weight: 400;
@@ -37,7 +35,8 @@
 
     /* Estilos del calendario */
     .calendario {
-        margin-top: 30px; /* Ajuste para mantener 30px de separación */
+        margin-top: 30px;
+        /* Ajuste para mantener 30px de separación */
     }
 
     /* Animación para el encabezado */
@@ -46,13 +45,14 @@
             transform: translateY(-20px);
             opacity: 0;
         }
+
         to {
             transform: translateY(0);
             opacity: 1;
         }
     }
 
-/* ---------------------------------------- QUE OFRECEMOS ----------------------------------------------- */
+    /* ---------------------------------------- QUE OFRECEMOS ----------------------------------------------- */
 
     .ofrecemos {
         position: relative;
@@ -60,29 +60,41 @@
         justify-content: center;
         padding: 60px 20px;
         min-height: 100vh;
-        background-image: url('../../assets/images/manuel-pappacena-zTwzxr4BbTA-unsplash.jpg'); 
+        background-image: url('../../assets/images/manuel-pappacena-zTwzxr4BbTA-unsplash.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
     }
 
     .overlay {
-        position: absolute; /* Cambiado a absolute para cubrir toda la imagen */
-        top: 0; /* Alinea al borde superior */
-        left: 0; /* Alinea al borde izquierdo */
-        right: 0; /* Alinea al borde derecho */
-        bottom: 0; /* Alinea al borde inferior */
-        background: rgba(0, 0, 0, 0.5); /* Superposición oscura */
-        display: flex; /* Habilita flexbox para centrar contenido */
-        flex-direction: column; /* Dirección de flex hacia abajo */
-        align-items: center; /* Centrar horizontalmente */
-        justify-content: center; /* Centrar verticalmente */
+        position: absolute;
+        /* Cambiado a absolute para cubrir toda la imagen */
+        top: 0;
+        /* Alinea al borde superior */
+        left: 0;
+        /* Alinea al borde izquierdo */
+        right: 0;
+        /* Alinea al borde derecho */
+        bottom: 0;
+        /* Alinea al borde inferior */
+        background: rgba(0, 0, 0, 0.5);
+        /* Superposición oscura */
+        display: flex;
+        /* Habilita flexbox para centrar contenido */
+        flex-direction: column;
+        /* Dirección de flex hacia abajo */
+        align-items: center;
+        /* Centrar horizontalmente */
+        justify-content: center;
+        /* Centrar verticalmente */
     }
 
     .ofrecemos__title {
         font-size: 2.5rem;
-        color: #fff; /* Color del texto en blanco */
-        margin-bottom: 40px; /* Espaciado debajo del título */
+        color: #fff;
+        /* Color del texto en blanco */
+        margin-bottom: 40px;
+        /* Espaciado debajo del título */
     }
 
     .features-container {
@@ -92,14 +104,17 @@
     }
 
     .feature {
-        background: var(--background-accent); /* Usa la variable para el color de fondo */
+        background: var(--background-accent);
+        /* Usa la variable para el color de fondo */
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         padding: 20px;
-        width: 300px; /* Ancho fijo para que todas las características tengan el mismo tamaño */
+        width: 300px;
+        /* Ancho fijo para que todas las características tengan el mismo tamaño */
         text-align: center;
         transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
-        border: 1px solid var(--button-color-secondary); /* Usa la variable para el borde */
+        border: 1px solid var(--button-color-secondary);
+        /* Usa la variable para el borde */
     }
 
     .feature:hover {
@@ -108,68 +123,92 @@
     }
 
     .feature.clickable {
-        cursor: pointer; /* Cambia el cursor a un puntero al pasar el mouse */
+        cursor: pointer;
+        /* Cambia el cursor a un puntero al pasar el mouse */
     }
 
     .feature h2 {
         font-size: 1.5rem;
-        color: var(--text); /* Usa la variable para el color del texto */
+        color: var(--text);
+        /* Usa la variable para el color del texto */
         margin: 15px 0;
     }
 
     .feature p {
         font-size: 1rem;
-        color: var(--text); /* Color del texto en las características */
+        color: var(--text);
+        /* Color del texto en las características */
     }
 
-/* ---------------------------------------- QUIENES SOMOS ----------------------------------------------- */
+    /* ---------------------------------------- QUIENES SOMOS ----------------------------------------------- */
 
     .descripcion {
-        max-width: 800px; /* Ancho máximo */
-        margin: 0 auto; /* Centrar la sección horizontalmente */
+        max-width: 800px;
+        /* Ancho máximo */
+        margin: 0 auto;
+        /* Centrar la sección horizontalmente */
         padding: 20px;
-        min-height: 80vh; /* Altura mínima de la sección */
+        min-height: 80vh;
+        /* Altura mínima de la sección */
         display: flex;
         flex-direction: column;
-        justify-content: center; /* Centrar el contenido verticalmente */
+        justify-content: center;
+        /* Centrar el contenido verticalmente */
 
     }
 
     .descripcion h1 {
-        font-size: 3rem; /* Aumentar el tamaño de fuente del título */
-        color: var(--text); /* Color del texto, usando la variable */
-        margin-bottom: 20px; /* Espaciado debajo del título */
+        font-size: 3rem;
+        /* Aumentar el tamaño de fuente del título */
+        color: var(--text);
+        /* Color del texto, usando la variable */
+        margin-bottom: 20px;
+        /* Espaciado debajo del título */
     }
 
     .descripcion p {
-        font-size: 1.5rem; /* Aumentar el tamaño de fuente del párrafo */
-        color: var(--textx); /* Color del texto */
-        line-height: 1.8; /* Altura de línea para mejorar la legibilidad */
-        margin: 0; /* Sin margen por defecto */
+        font-size: 1.5rem;
+        /* Aumentar el tamaño de fuente del párrafo */
+        color: var(--textx);
+        /* Color del texto */
+        line-height: 1.8;
+        /* Altura de línea para mejorar la legibilidad */
+        margin: 0;
+        /* Sin margen por defecto */
     }
 
-/* ---------------------------------------- DONDE ESTAMOS ----------------------------------------------- */
+    /* ---------------------------------------- DONDE ESTAMOS ----------------------------------------------- */
 
     .ubicacion {
-        max-width: 800px; /* Ancho máximo */
-        margin: 0 auto; /* Centrar la sección horizontalmente */
+        max-width: 800px;
+        /* Ancho máximo */
+        margin: 0 auto;
+        /* Centrar la sección horizontalmente */
         padding: 20px;
-        min-height: 80vh; /* Altura mínima de la sección */
+        min-height: 80vh;
+        /* Altura mínima de la sección */
         display: flex;
         flex-direction: column;
-        justify-content: center; /* Centrar el contenido verticalmente */
+        justify-content: center;
+        /* Centrar el contenido verticalmente */
     }
 
     .ubicacion h1 {
-        font-size: 3rem; /* Aumentar el tamaño de fuente del título */
-        color: var(--text); /* Color del texto, usando la variable */
-        margin-bottom: 20px; /* Espaciado debajo del título */
+        font-size: 3rem;
+        /* Aumentar el tamaño de fuente del título */
+        color: var(--text);
+        /* Color del texto, usando la variable */
+        margin-bottom: 20px;
+        /* Espaciado debajo del título */
     }
 
     .ubicacion p {
-        font-size: 1.2rem; /* Tamaño de fuente del párrafo */
-        color: var(--textx); /* Color del texto */
-        line-height: 1.6; /* Altura de línea para mejorar la legibilidad */
+        font-size: 1.2rem;
+        /* Tamaño de fuente del párrafo */
+        color: var(--textx);
+        /* Color del texto */
+        line-height: 1.6;
+        /* Altura de línea para mejorar la legibilidad */
     }
 
     .map-container {
@@ -180,13 +219,16 @@
         overflow: hidden;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
-/* ---------------------------------------- INFORMACION SOBRE EL CLUB ----------------------------------------------- */
+
+    /* ---------------------------------------- INFORMACION SOBRE EL CLUB ----------------------------------------------- */
 
     .informacion {
         position: relative;
         display: flex;
-        justify-content: flex-start; /* Mantiene el contenido alineado a la izquierda */
-        align-items: center; /* Centra verticalmente */
+        justify-content: flex-start;
+        /* Mantiene el contenido alineado a la izquierda */
+        align-items: center;
+        /* Centra verticalmente */
         padding: 60px 20px;
         min-height: 100vh;
         background-image: url('../../assets/images/oskar-hagberg-3sSbRisCnmE-unsplash.jpg');
@@ -197,38 +239,165 @@
 
     .features-container-informacion {
         display: flex;
-        flex-direction: column; /* Mantiene las características en columna */
-        justify-content: center; /* Alinea verticalmente al centro */
-        gap: 0; /* Eliminado para manejar el espaciado a través de bordes */
-        width: 50%; /* El ancho del contenedor ocupa la mitad de la imagen */
-        height: 100%; /* El alto del contenedor ocupa todo el alto de la imagen */
-        background-color: rgba(0, 0, 0, 0.6); /* Fondo oscuro semitransparente */
+        flex-direction: column;
+        justify-content: center;
+        gap: 0;
+        width: 50%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
         padding: 40px;
-        position: absolute; /* Permite que se superponga sobre la imagen */
-        left: 0; /* Alinea el contenedor a la izquierda */
-        top: 0; /* Inicia desde la parte superior de la imagen */
-        height: calc(100% - 10%); /* Ajusta según el padding o márgenes */
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: calc(100% - 10%);
     }
 
     .feature-informacion {
         padding: 20px;
-        width: 100%; /* Ocupar todo el ancho del contenedor */
+        width: 100%;
         text-align: left;
         color: var(--white-text);
-        border-bottom: 2px solid var(--white-text); /* Línea divisoria entre características */
+        border-bottom: 2px solid var(--white-text);
     }
 
     .feature-informacion:last-child {
-        border-bottom: none; /* Elimina la línea en el último elemento */
+        border-bottom: none;
     }
 
     .feature-informacion h2 {
-        font-size: 3rem; /* Aumenta el tamaño de la fuente */
-        color: var(--white-text); /* Usa la variable para el color del texto */
+        font-size: 3rem;
+        color: var(--white-text);
     }
 
     .feature-informacion p {
-        font-size: 1.5rem; /* Aumenta el tamaño de la fuente del texto */
-        color: var(--white-text); /* Color del texto en las características */
-        margin: 10px 0; /* Ajusta el margen del párrafo */
+        font-size: 1.5rem;
+        /* Aumenta el tamaño de la fuente del texto */
+        color: var(--white-text);
+        /* Color del texto en las características */
+        margin: 10px 0;
+        /* Ajusta el margen del párrafo */
+    }
+
+    /* ---------------------------------------- QUE OFRECEMOS ----------------------------------------------- */
+    .dashboard-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        background-color: #f0f6f6;
+        /* Color de fondo suave */
+    }
+
+    /* ---------------------------------------- SIDEBAR----------------------------------------------- */
+    .home-sidebar {
+        min-height: 100vh;
+        margin-left: 20%;
+        padding: 20px;
+        background-color: transparent;
+    }
+    
+    .dashboard-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        background-color: transparent;
+    }
+    
+    .stat-cards {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px; /* Espacio entre las stat-cards */
+    }
+    
+    .stat-card {
+        background: #F6FDF9;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+        width: calc(33.33% - 13.33px); /* Para que se acomoden en 3 columnas */
+    }
+    
+    .stat-card:hover {
+        transform: scale(1.05);
+    }
+    
+    .stat-card h3 {
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .stat-card p {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--button-color-primary);
+        margin-bottom: 5px;
+    }
+    
+    .stat-card small {
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+
+      
+    .action-cards {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px; /* Espacio entre las action-cards */
+    }
+    
+    .action-card {
+        margin: 20px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        text-align: center;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+        width: calc(33.33% - 13.33px); /* Para que se acomoden en 3 columnas */
+    }
+    
+    .action-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    /* Estilo del botón */
+    .action-card button {
+        all: unset;
+        display: block;
+        width: 100%;
+        cursor: pointer;
+    }
+    
+    /* Estilo del icono dentro de un círculo */
+    .icon-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 10px;
+        border-radius: 50%;
+        background-color: var(--button-color-primary);
+        color: var(--icon);
+        font-size: 30px;
+    }
+    
+    /* Estilo del título */
+    h4 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 10px 0;
+        color: var(--text);
+    }
+    
+    /* Estilo de la descripción */
+    p {
+        font-size: 12px;
+        color: #777;
+        margin: 0;
     }

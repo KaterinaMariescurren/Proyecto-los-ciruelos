@@ -1,7 +1,9 @@
 package Grupo11.Seminario.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +53,13 @@ public class ReservaService {
     public List<Reserva> buscar_reservas(Integer jugador_id){
         return i_reserva_repository.findByJugadorId(jugador_id);
     }
+
+    public List<Reserva> buscar_todas_reservas() {
+        List<Reserva> reservas = new ArrayList<>();
+        i_reserva_repository.findAll().forEach(reservas::add);
+        return reservas;
+    }
+
 
     public Cancha buscar_cancha(Integer numero_cancha){
         return i_cancha_repository.findByNumero(numero_cancha).get();
@@ -124,5 +133,21 @@ public class ReservaService {
 
     public ResponseEntity<String> buscar_pago(Long id_mp) throws JsonMappingException, JsonProcessingException{
         return pago_service.buscar_pago(id_mp);
+    }
+
+    public List<Reserva> buscarReservas(String email, String nombre, String apellido, LocalDate fecha) {
+        if (email != null && !email.isEmpty()) {
+            return i_reserva_repository.findByJugadorEmailOrderByFechaAsc(email);
+        }
+        if (nombre != null && !nombre.isEmpty()) {
+            return i_reserva_repository.findByJugadorNombreOrderByFechaAsc(nombre);
+        }
+        if (apellido != null && !apellido.isEmpty()) {
+            return i_reserva_repository.findByJugadorApellidoOrderByFechaAsc(apellido);
+        }
+        if (fecha != null) {
+            return i_reserva_repository.findByFechaOrderByFechaAsc(fecha);
+        }
+        return i_reserva_repository.findAllByOrderByFechaAsc(); // Si no hay filtros, devuelve todas las reservas ordenadas
     }
 }

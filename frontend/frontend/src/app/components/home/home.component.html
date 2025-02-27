@@ -1,87 +1,112 @@
-<app-navbar></app-navbar>
-<div class="home">
-
+<!-- VISTA PARA EMPLEADOS Y USUARIOS NORMALES -->
+<div *ngIf="rol !== 'duenio' && rol !== 'empleado'" class="home">
   <div #calendario class="encabezado" id="services">
     <div class="overlay">
       <header class="home_header">
         <h1>Los Ciruelos Padel Club</h1>
-        <p class="description">
-          Alcanza tu mejor nivel
-        </p>
-        <p class="description">Elige tu turno</p>
+        <h2 class="description">Alcanza tu mejor nivel</h2>
+        <h2 class="description">Elige tu turno</h2>
       </header>
-    
+
       <div id="calendario" class="calendario">
         <app-calendario_reserva></app-calendario_reserva>
       </div>
     </div>
-  
   </div>
-  
-  <div class="descripcion" id="sobre-nosotros">
-    <h1>¿Quienes Somos?</h1>
-    <p>En Los Ciruelos, nos apasiona el deporte y estamos comprometidos a ofrecerte la mejor experiencia de juego. 
 
-    Lo que buscamos es promover el pádel y facilitar el acceso a este deporte a todos los niveles de jugadores. Creemos que el pádel no solo es un deporte, sino una forma de vida que fomenta la salud, la amistad y la diversión.
-    
-    En Los Ciruelos, no solo jugamos pádel, vivimos el pádel. Te invitamos a formar parte de nuestra familia y disfrutar de todo lo que tenemos para ofrecerte.</p>
+  <div class="descripcion" id="sobre-nosotros">
+    <h1>¿Quiénes Somos?</h1>
+    <p>En Los Ciruelos, nos apasiona el deporte y estamos comprometidos a ofrecerte la mejor experiencia de juego.</p>
   </div>
 
   <section class="ofrecemos">
-      <div class="overlay">
-          <h1 class="ofrecemos__title">Los Ciruelos te lo pone en bandeja</h1>
-          <div class="features-container">
-            <div class="feature clickable" (click)="scrollToCalendar()">
-                <h2>Reserva Cancha</h2>
-                <p>Reserva tu turno en solo unos minutos con nuestro sistema en línea fácil de usar.</p>
-            </div>
-            <div class="feature">
-                    <h2>Sin Limites</h2>
-                    <p>Paga tus canchas de pádel de manera rápida y segura desde cualquier lugar.</p>
-            </div>
-            <div class="feature clickable" (click)="asociarse()">
-                    <h2>Forma parte de la comunidad</h2>
-                    <p>Únete a nuestra comunidad y disfruta de ser socio de Los Ciruelos. Los miembros tienen acceso a beneficios exclusivos</p>
-            </div>
-          </div>
+    <div class="overlay">
+      <h1 class="ofrecemos__title">Los Ciruelos te lo pone en bandeja</h1>
+      <div class="features-container">
+        <div class="feature clickable" (click)="scrollToCalendar()">
+          <h2>Reserva Cancha</h2>
+          <p>Reserva tu turno en solo unos minutos con nuestro sistema en línea fácil de usar.</p>
+        </div>
+        <div class="feature">
+          <h2>Sin Límites</h2>
+          <p>Paga tus canchas de pádel de manera rápida y segura desde cualquier lugar.</p>
+        </div>
+        <div class="feature clickable" (click)="asociarse()">
+          <h2>Forma parte de la comunidad</h2>
+          <p>Únete a nuestra comunidad y disfruta de ser socio de Los Ciruelos.</p>
+        </div>
       </div>
+    </div>
   </section>
-  
+
   <div class="ubicacion">
-    <h1>¿Donde estamos?</h1>
-    <p>Calle 34 entre 25 y 26, La Plata, Provincia de Buenos Aires. Argentina </p>
+    <h1>¿Dónde estamos?</h1>
+    <p>Calle 34 entre 25 y 26, La Plata, Provincia de Buenos Aires, Argentina.</p>
     <div class="map-container">
-      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1635.7379947633717!2d-57.98705530949234!3d-34.91959755690651!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95a2e7eab549ef49%3A0x8c4de69e1a196193!2sLos%20Ciruelos!5e0!3m2!1ses!2sar!4v1739214238893!5m2!1ses!2sar" width="900" height="500" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1635.7379947633717!2d-57.98705530949234!3d-34.91959755690651!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95a2e7eab549ef49%3A0x8c4de69e1a196193!2sLos%20Ciruelos!5e0!3m2!1ses!2sar!4v1739214238893!5m2!1ses!2sar"
+        width="900" height="500" style="border:0;" allowfullscreen="" loading="lazy">
+      </iframe>
     </div>
   </div>
-
-  <!-- Agregar API  -->
-
-  <section class="informacion" id="contactos">
-    <div class="features-container-informacion">
-      <div class="feature-informacion">
-        <h2>Horarios del Club</h2>
-        <p>Lunes a Sabados 
-          11:00hs a 00:00hs
-        </p>
-      </div>
-      <div class="feature-informacion">
-        <h2>Contactos</h2>
-        <p>0221 411-08556</p>
-      </div>
-      <div class="feature-informacion">
-        <h2>Servicios del Club</h2>
-        <ul>
-            <li>Wifi</li>
-            <li>Estacionamiento</li>
-            <li>Vestuario</li>
-            <li>Bar/Restaurante</li>
-            <li>Disposición de paletas</li>
-            <li>Servicio de Emergencias</li>
-        </ul>
-    </div>
-    </div>
-  </section>
-
 </div>
 
+<!-- ----------------------------- VISTA DUEÑO Y EMPLEADO ------------------------------------------ -->
+
+<div *ngIf="rol === 'duenio' || rol === 'empleado'" class="home-sidebar">
+  <div class="dashboard-content">
+    <div class="stat-cards">
+      <div class="stat-card">
+        <h3>Jugadores Activos</h3>
+        <p>248</p>
+        <small>+12% desde el mes pasado</small>
+      </div>
+
+      <div class="stat-card">
+        <h3>Reservas de Hoy</h3>
+        <p>32</p>
+        <small>85% de las canchas ocupadas</small>
+      </div>
+
+      <div class="stat-card">
+        <h3>Nuevos Miembros</h3>
+        <p>18</p>
+        <small>Esta semana</small>
+      </div>
+    </div>
+
+    <div class="action-cards">
+      <!-- SOLO EL DUEÑO PUEDE VER ESTO -->
+      <div class="action-card" *ngIf="rol === 'duenio'">
+        <button routerLink="">
+          <div class="icon-container">
+            <span class="material-icons">person_add</span>
+          </div>
+          <h4>Nuevo Jugador</h4>
+          <p>Registrar a un nuevo jugador</p>
+        </button>
+      </div>
+
+      <div class="action-card">
+        <button routerLink="/calendario">
+          <div class="icon-container">
+            <span class="material-icons">event_available</span>
+          </div>
+          <h4>Registrar Reserva</h4>
+          <p>Reservar una cancha</p>
+        </button>
+      </div>
+
+      <!-- SOLO EL DUEÑO PUEDE VER ESTO -->
+      <div class="action-card" *ngIf="rol === 'duenio'">
+        <button routerLink="/register-empleado">
+          <div class="icon-container">
+            <span class="material-icons">work</span>
+          </div>
+          <h4>Añadir Empleado</h4>
+          <p>Agregar un nuevo miembro al equipo</p>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

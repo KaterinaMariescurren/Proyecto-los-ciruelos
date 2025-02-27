@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 import Grupo11.Seminario.Entities.ConfiguracionGeneral;
 import Grupo11.Seminario.Service.ConfiguracionGeneralService;
 import Grupo11.Seminario.Service.RegistroService;
@@ -29,10 +30,9 @@ public class ConfiguracionGeneralController {
         return ResponseEntity.ok().body(configuracion_general_service.get_configuracion_general());
     }
 
-    @PutMapping("/private/actualizar_configuracion")
-    public ResponseEntity<?> actualizar_configuracion_general(HttpServletRequest request, @RequestBody ConfiguracionGeneral nueva_configuracion) {
+    @PutMapping("/public/actualizar_configuracion")
+    public ResponseEntity<?> actualizar_configuracion_general(@RequestParam String email, @RequestBody ConfiguracionGeneral nueva_configuracion) {
         
-        String email = (String) request.getAttribute("email");
         Integer id_duenio = usuario_service.buscar_usuario(email).get().getId();
         
         // Se verifica que exista el empleado con dicho Id

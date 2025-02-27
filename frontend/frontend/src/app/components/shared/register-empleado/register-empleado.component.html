@@ -1,0 +1,138 @@
+<div class="form">
+    <div class="form__container">
+
+        <h1>Registrar Empleado</h1>
+
+        <form [formGroup]="form" (ngSubmit)="signUp()" novalidate>
+
+            <!-- Nombre y Apellido -->
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="custom-field">
+                    <mat-label>Nombre</mat-label>
+                    <input matInput formControlName="name" aria-label="Nombre" />
+                    <mat-error *ngIf="form.get('name')?.touched && form.get('name')?.hasError('required')">
+                        Este campo es obligatorio.
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="custom-field">
+                    <mat-label>Apellido</mat-label>
+                    <input matInput formControlName="lastName" aria-label="Apellido" />
+                    <mat-error *ngIf="form.get('lastName')?.touched && form.get('lastName')?.hasError('required')">
+                        Este campo es obligatorio.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+
+            <!-- Correo -->
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="custom-field">
+                    <mat-label>Correo electrónico</mat-label>
+                    <input matInput formControlName="email" aria-label="Correo electrónico" />
+                    <mat-error *ngIf="form.get('email')?.touched">
+                        <ng-container *ngIf="form.get('email')?.hasError('required')">
+                            Este campo es obligatorio.
+                        </ng-container>
+                        <ng-container *ngIf="form.get('email')?.hasError('pattern')">
+                            Correo electrónico inválido.
+                        </ng-container>
+                        <ng-container *ngIf="form.get('email')?.hasError('emailTaken')">
+                            Correo electrónico ya registrado.
+                        </ng-container>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <!-- Campo Contraseña -->
+            <mat-form-field appearance="outline" class="custom-field password-field">
+                <mat-label>Contraseña</mat-label>
+                <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password"
+                    placeholder="Introduce tu contraseña" (focus)="onFocusPassword()" (blur)="onBlurPassword()" />
+                <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword"
+                    [attr.aria-label]="hidePassword ? 'Mostrar contraseña' : 'Ocultar contraseña'" type="button"
+                    class="password-toggle-button">
+                    <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                <mat-error *ngIf="form.get('password')?.touched && form.get('password')?.hasError('required')">
+                    Este campo es obligatorio.
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Requisitos de contraseña -->
+            <div *ngIf="showPasswordRequirements" class="password-requirements">
+                <ul>
+                    <li [class.valid]="passwordRequirements.minLength">Debe tener al menos 6 caracteres</li>
+                    <li [class.valid]="passwordRequirements.hasUpperCase">Debe tener una letra mayúscula</li>
+                    <li [class.valid]="passwordRequirements.hasNumber">Debe contener al menos un número</li>
+                </ul>
+            </div>
+
+            <!-- Campo Confirmar Contraseña -->
+            <mat-form-field appearance="outline" class="custom-field password-field">
+                <mat-label>Confirmar contraseña</mat-label>
+                <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword"
+                    (blur)="checkPasswordMatch()" />
+                <button mat-icon-button matSuffix (click)="toggleHideConfirmPassword()"
+                    [attr.aria-label]="hideConfirmPassword ? 'Mostrar contraseña' : 'Ocultar contraseña'" type="button"
+                    class="password-toggle-button">
+                    <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                <mat-error *ngIf="form.get('confirmPassword')?.touched">
+                    <ng-container *ngIf="form.get('confirmPassword')?.hasError('required')">
+                        Este campo es obligatorio.
+                    </ng-container>
+
+                    <ng-container *ngIf="form.get('confirmPassword')?.hasError('mismatch')">
+                        Las contraseñas no coinciden.
+                    </ng-container>
+                </mat-error>
+            </mat-form-field>
+
+            <div formArrayName="phones" class="phones-container">
+                <div *ngFor="let phone of phones.controls; let i = index" class="phone-entry">
+                    <mat-form-field appearance="outline" class="custom-field">
+                        <mat-label>Número de Teléfono</mat-label>
+                        <input matInput [formControlName]="i" placeholder="Ej. 123456" />
+
+                        <!-- Botón para eliminar teléfono -->
+                        <button mat-icon-button matSuffix (click)="removePhone(i)" aria-label="Eliminar teléfono"
+                            class="password-toggle-button">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+
+                        <mat-error *ngIf="phone.touched">
+                            <ng-container *ngIf="phone.hasError('required')">
+                                Número de teléfono es obligatorio.
+                            </ng-container>
+                            <ng-container *ngIf="phone.hasError('pattern')">
+                                Número de teléfono inválido (debe tener entre 6 y 15 dígitos).
+                            </ng-container>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div class="add-phone-button">
+                <button *ngIf="phones.length < maxPhones" mat-button (click)="addPhone()" class="submit-button">
+                    Agregar teléfono
+                </button>
+            </div>
+
+            <!-- Botón de registro -->
+            <div class="register-button">
+                <button mat-raised-button type="submit" class="submit-button">
+                    Registrar
+                </button>
+            </div>
+
+            <!-- Mostrar mensajes de error globales -->
+            <div *ngIf="errorMessages.length > 0" class="error-messages">
+                <ng-container *ngFor="let error of errorMessages">
+                    <div>{{ error }}</div>
+                </ng-container>
+            </div>
+        </form>
+
+    </div>
+</div>

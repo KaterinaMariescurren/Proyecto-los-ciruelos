@@ -1,0 +1,123 @@
+<div class="home-sidebar">
+  <div class="form__container">
+    <h1 class="form__title">Configurar General</h1>
+
+    <form [formGroup]="form" (ngSubmit)="guardarConfiguracion()">
+
+      <!-- Valor de Reserva y Pelota-->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Valor de reserva</mat-label>
+          <input matInput formControlName="monto_reserva" />
+          <mat-error *ngIf="form.get('monto_reserva')?.hasError('required')">Este campo es obligatorio.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Valor de pelota</mat-label>
+          <input matInput formControlName="monto_pelotas" />
+          <mat-error *ngIf="form.get('monto_pelotas')?.hasError('required')">Este campo es obligatorio.</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Valor de Asociación y Stock de Pelota-->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Valor de Asociación</mat-label>
+          <input matInput formControlName="monto_asociacion" />
+          <mat-error *ngIf="form.get('monto_asociacion')?.hasError('required')">Este campo es obligatorio.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Stock de Pelota</mat-label>
+          <input matInput formControlName="stock_pelota" />
+          <mat-error *ngIf="form.get('stock_pelota')?.hasError('required')">Este campo es obligatorio.</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Descuento para Socio y Valor de Paleta-->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Descuento para Socio</mat-label>
+          <input matInput formControlName="descuento_socio" />
+          <mat-error *ngIf="form.get('descuento_socio')?.hasError('required')">Este campo es obligatorio.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Valor de Paleta</mat-label>
+          <input matInput formControlName="monto_paletas" />
+          <mat-error *ngIf="form.get('monto_paletas')?.hasError('required')">Este campo es obligatorio.</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Porcentaje de Seña y Stock de Paleta-->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Porcentaje de Seña</mat-label>
+          <input matInput formControlName="porcentaje_seña" />
+          <mat-error *ngIf="form.get('porcentaje_seña')?.hasError('required')">Este campo es obligatorio.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Stock de Paleta</mat-label>
+          <input matInput formControlName="stock_paleta" />
+          <mat-error *ngIf="form.get('stock_paleta')?.hasError('required')">Este campo es obligatorio.</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Duración del Turno -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Duración mínima del turno</mat-label>
+          <input matInput formControlName="duracion_minima_turno" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Duración máxima del turno</mat-label>
+          <input matInput formControlName="duracion_maxima_turno" />
+        </mat-form-field>
+      </div>
+
+      <!-- Dias y horarios abiertos -->
+      <table>
+        <thead>
+          <tr>
+            <th>Día</th>
+            <th>Abierto</th>
+            <th>Horario de Apertura</th>
+            <th>Horario de Cierre</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let dia of diasApertura; let i = index">
+            <td>{{ dia.dia }}</td>
+            <td>
+              <mat-form-field appearance="outline">
+                <mat-select [(value)]="diasApertura[i].abierto" (selectionChange)="actualizarAbierto(i, $event.value)">
+                  <mat-option [value]="true">Sí</mat-option>
+                  <mat-option [value]="false">No</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+            <td>
+              <mat-form-field appearance="outline">
+                <input matInput type="time" [disabled]="!diasApertura[i].abierto" [value]="diasApertura[i].horario_inicio"
+                  (change)="actualizarHorario(i, 'horario_inicio', $any($event.target).value)">
+              </mat-form-field>
+            </td>
+            
+            <td>
+              <mat-form-field appearance="outline">
+                <input matInput type="time" [disabled]="!diasApertura[i].abierto" [value]="diasApertura[i].horario_fin"
+                  (change)="actualizarHorario(i, 'horario_fin', $any($event.target).value)">
+              </mat-form-field>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="register-button">
+        <button type="submit" [disabled]="!formChanged()">Guardar Configuración</button>
+      </div>
+    </form>
+  </div>
+</div>

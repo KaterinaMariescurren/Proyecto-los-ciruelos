@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { AuthService } from '../../../../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router'; // Importa Router
 import { ToastrService } from 'ngx-toastr';
+import { ApiService } from '../../../../../api.service';
 
 @Component({
   selector: 'app-button-providers',
@@ -21,6 +22,7 @@ export class ButtonProviders {
     private authService: AuthService, 
     private fb: FormBuilder, 
     private router: Router, 
+    private api: ApiService,
     private route: ActivatedRoute,
     private toastrService: ToastrService
   ) { 
@@ -41,6 +43,12 @@ export class ButtonProviders {
         const name = userData.user.displayName;
 
         //Verificar si el email esta registrado en el Backend, si lo esta redireccionar al home, sino al postregister
+
+        // Obtener el rol y almacenarlo
+        this.api.getRol().subscribe(roleData => {
+          this.api.setRolInStorage(roleData.message);
+          console.log("Rol guardado:", roleData.message);
+        });
 
         this.router.navigate(["/home"],{ replaceUrl: true });
       }

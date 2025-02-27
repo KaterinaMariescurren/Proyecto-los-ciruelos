@@ -3,12 +3,11 @@ package Grupo11.Seminario.Controller;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +22,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import Grupo11.Seminario.DTO.PagoMercadoPagoDTO;
-import Grupo11.Seminario.DTO.ReservaCancelacionDTO;
 import Grupo11.Seminario.DTO.ReservaDTO;
 import Grupo11.Seminario.Entities.Cancha;
 import Grupo11.Seminario.Entities.Cuenta;
@@ -76,13 +74,40 @@ public class ReservaController {
                     id_jugador = reservaDTO.getId_reservador();
 
                     Empleado empleado = reserva_service.buscar_empleado(id_empleado);
-                    reserva.setEmpleado(empleado);
 
                     if (id_jugador!=null){
                         // Se verifica que exista el jugador con dicho Id
                         if (reserva_service.existe_jugador(id_jugador)){
                             Jugador jugador = reserva_service.buscar_jugador(id_jugador);
                             reserva.setJugador(jugador);
+
+                            if (empleado!=null){
+                                reserva.setEmpleado(empleado);
+                                reserva.setEstado(EstadoReserva.Pagada);
+                                // Se busca la cancha
+                                Cancha cancha = reserva_service.buscar_cancha(reservaDTO.getNumero_cancha());
+        
+                                // Se crea el Turno
+                                Turno turno = new Turno();
+                                turno.setCancha(cancha);
+                                turno.setFecha(reservaDTO.getFecha());
+                                turno.setHorarioInicio(reservaDTO.getHorario_inicio());
+                                turno.setHorario_fin(reservaDTO.getHorario_fin());
+                                turno.setEstado(EstadoTurno.Reservado);
+        
+                                reserva.setTurno(turno);
+                                reserva.setFecha(LocalDate.now());
+                                reserva.setHora(LocalTime.now());
+                                reserva.setCantidad_paletas(reservaDTO.getCantidad_paletas());
+                                reserva.setCantidad_pelotas(reservaDTO.getCantidad_pelotas());
+                                reserva.setPrecio(reserva_service.calcular_precio_reserva(
+                                    reserva.getCantidad_pelotas(), 
+                                    reserva.getCantidad_paletas(), 
+                                    reserva_service.calcular_medias_horas(reservaDTO.getHorario_inicio(), reservaDTO.getHorario_fin())));
+                                reserva_service.guardar_reserva(reserva);
+                                return ResponseEntity.ok().body(reservaDTO);
+
+                            }
                         }else{
                             return ResponseEntity.badRequest().body("No se encontro el jugador");
                         }
@@ -146,6 +171,8 @@ public class ReservaController {
 
                     // Se guarda la Reserva y el Turno
                     reserva_service.guardar_reserva(reserva);
+
+                    // restar stock de paletas y pelotas
                     
                     return ResponseEntity.ok().body(reservaDTO);
                 }
@@ -165,21 +192,41 @@ public class ReservaController {
             return null;
     }
 
+    @GetMapping(path = "/consultar/todas_reservas")
+    public ResponseEntity<List<Reserva>> consultarTodasReservas(@RequestParam String email){
+        Integer id_empleado = usuarioService.buscar_usuario(email).get().getId();
+        if (reserva_service.existe_empleado(id_empleado)){
+            return ResponseEntity.ok(reserva_service.buscar_todas_reservas());
+        }
+            return null;
+    }
+
     @PutMapping(path = "/cancelar/reserva")
-    public ResponseEntity<Map<String, String>> cancelarReserva(@RequestBody ReservaCancelacionDTO request){
-        Integer id_accionar = usuarioService.buscar_usuario(request.getEmail()).get().getId();
-        Map<String, String> response = new HashMap<>();
-        if (reserva_service.existe_jugador(id_accionar)){
-            Optional<Reserva> optReserva = reserva_service.buscar_reserva(request.getId_reserva());
+    public ResponseEntity<String> cancelarReserva(@RequestParam String email, @RequestParam Integer id_reserva){
+        Integer id_accionar = usuarioService.buscar_usuario(email).get().getId();
+        if (reserva_service.existe_jugador(id_accionar) || reserva_service.existe_empleado(id_accionar)){
+            Optional<Reserva> optReserva = reserva_service.buscar_reserva(id_reserva);
             if (optReserva.isPresent()) {
-                response.put("message", "Se cancelo la reserva");
                 Reserva reserva = optReserva.get();
                 reserva.setEstado(EstadoReserva.Cancelada);
                 reserva_service.guardar_reserva(reserva);
-                return ResponseEntity.ok(response);
+
+                // sumar paletas y pelotas 
+                return ResponseEntity.ok("Se cancelo la reserva");
             }
         }
-        response.put("message", "No se encontro al usuario");
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.badRequest().body("No se encontro al usuario");
+
+    }
+
+    @GetMapping(path = "/reservas/filtrar")
+    public ResponseEntity<List<Reserva>> obtenerReservasFiltradas(
+        @RequestParam(required = false) String email,
+        @RequestParam(required = false) String nombre,
+        @RequestParam(required = false) String apellido,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+
+        List<Reserva> reservas = reserva_service.buscarReservas(email, nombre, apellido, fecha);
+        return ResponseEntity.ok(reservas);
     }
 }

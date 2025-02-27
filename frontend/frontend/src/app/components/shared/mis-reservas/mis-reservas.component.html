@@ -23,11 +23,11 @@
             <p><strong>Pelotas:</strong> {{ reserva.cantidad_pelotas }}</p>
             <p><strong>Paletas:</strong> {{ reserva.cantidad_paletas }}</p>
             <p><strong>Estado:</strong> {{ reserva.estado }}</p>
+            <p><strong>Pagado: </strong>${{ reserva.estado === 'Pendiente' ? reserva.precio : getPrecioTotal(reserva.pagos) }}</p>
     
-            <!-- Mostrar botón solo si la reserva NO está cancelada y la fecha NO ha pasado 
             <button class="boton-cancelar" *ngIf="!esReservaCanceladaOExpirada(reserva)" (click)="cancelarReserva(reserva.id)">
                 Cancelar Reserva
-            </button> -->
+            </button>
         </div>
     </div>    
 
