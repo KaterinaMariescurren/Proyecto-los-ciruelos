@@ -39,9 +39,11 @@ export class NavbarComponent implements OnInit {
   
       if (this.isLoggedIn) {
         this.apiService.getRol().subscribe(response => {
-          this.rol = response.message; // Asegurarte de que la API devuelve el rol correctamente
+          this.rol = response.message; // Ahora puede ser "duenio", "empleado" o null
+          console.log('Rol asignado:', this.rol);
+  
           this.apiService.setRolInStorage(this.rol);
-          this.cdRef.detectChanges(); // Forzar actualización del Navbar
+          this.cdRef.detectChanges(); // Forzar actualización del Navbar/Sidebar
         });
       } else {
         this.rol = null;
@@ -49,9 +51,8 @@ export class NavbarComponent implements OnInit {
         this.cdRef.detectChanges();
       }
     });
-  
-    this.rol = this.apiService.getRolFromStorage(); // Recuperar el rol guardado al iniciar
   }
+  
   
 
   navigateOrScroll(sectionId: string) {

@@ -54,7 +54,7 @@ export class ConsultarUsuariosComponent {
 
         this.cdRef.detectChanges();
 
-        if (this.rol === 'duenio') {
+        if (this.rol === 'duenio' || this.rol === 'empleado') {
           this.apiService.getUsuarios().subscribe({
             next: (usuarios) => {
               console.log("Usuarios obtenidos del backend:", usuarios);
@@ -114,14 +114,16 @@ export class ConsultarUsuariosComponent {
   }
 
   // Columnas de la tabla
-  displayedColumns: string[] = ['nombre', 'email', 'categoria', 'socio', 'profesor', 'acciones'];
+  displayedColumns: string[] = ['nombre', 'email', 'categoria', 'socio', 'profesor'];
 
   // Variables para modales
   mostrarModal = false;
   accionModal = '';
   usuarioSeleccionado: any;
+  
   mostrarModalDesasociar = false;
   mostrarModalDesasignarRolProfesor = false;
+
   usuarioSeleccionadoDesasociar: any;
   usuarioSeleccionadoDesAsignarRolProfesor: any;
 
@@ -224,17 +226,19 @@ export class ConsultarUsuariosComponent {
 
       this.apiService.sacarRolProfesor(duenioEmail, this.usuarioSeleccionadoDesAsignarRolProfesor.id).subscribe({
         next: () => {
-          this.toastrService.success(`El usuario ${this.usuarioSeleccionadoDesAsignarRolProfesor.nombre} ha sido desasociado`);
+          this.toastrService.success(`El usuario ${this.usuarioSeleccionadoDesAsignarRolProfesor.nombre} ha sido desasignado como profesor`);
           this.obtenerUsuarios();
         },
         error: () => {
-          this.toastrService.error('Error al desasociar el jugador', 'Error');
+          this.toastrService.error('Error al desasignar el rol de profesor', 'Error');
         }
       });
 
-      this.cerrarModalDesasociar();
+      // Cambia esta línea:
+      this.cerrarModalDesasignarRolProfesor();
     });
   }
+
 
 }
 

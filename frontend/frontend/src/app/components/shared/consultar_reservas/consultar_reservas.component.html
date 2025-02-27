@@ -2,20 +2,45 @@
     <!-- Barra de Búsqueda y Filtros -->
     <div class="filter-container">
         <mat-form-field appearance="outline">
-            <input type="text" matInput placeholder="Buscar por nombre/email" [(ngModel)]="busqueda" (input)="filtrarReservas()">
+            <input matInput placeholder="Buscar por nombre/email" [(ngModel)]="busqueda" (input)="filtrarReservas()">
             <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field >
+        </mat-form-field>
 
         <div class="filters">
-            <input type="date" [(ngModel)]="filtro.fecha" (change)="filtrarReservas()">
-            <select [(ngModel)]="filtro.cancha" (change)="filtrarReservas()">
-                <option value="">Seleccionar cancha</option>
-                <option *ngFor="let cancha of canchas" [value]="cancha">{{ cancha }}</option>
-            </select>
-            <select [(ngModel)]="filtro. horarioInicio" (change)="filtrarReservas()">
-                <option value="">Horario de reserva</option>
-                <option *ngFor="let horario of horarios" [value]="horario">{{ horario }}</option>
-            </select>
+            <mat-form-field appearance="outline" floatLabel="always">
+                <mat-label>Fecha</mat-label>
+                <input matInput [matDatepicker]="picker" [(ngModel)]="filtro.fecha" (dateChange)="filtrarReservas()">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" floatLabel="always">
+                <mat-label>Cancha</mat-label>
+                <mat-select [(ngModel)]="filtro.cancha" (selectionChange)="filtrarReservas()">
+                    <mat-option value="">Todas</mat-option>
+                    <mat-option *ngFor="let cancha of canchas" [value]="cancha">{{ cancha }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" floatLabel="always">
+                <mat-label>Horario de reserva</mat-label>
+                <input type="text" matInput [(ngModel)]="filtro.horarioInicio" (input)="filtrarHorarios()"
+                    (keyup.enter)="filtrarReservas()" [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="filtrarReservas()">
+                    <mat-option (click)="limpiarHorario()" [value]="">Todos los horarios</mat-option>
+                    <mat-option *ngFor="let horario of horariosFiltrados" [value]="horario">
+                        {{ horario }}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" floatLabel="always">
+                <mat-label>Estado</mat-label>
+                <mat-select [(ngModel)]="filtro.estado" (selectionChange)="filtrarReservas()">
+                    <mat-option value="">Todos</mat-option>
+                    <mat-option *ngFor="let estado of estados" [value]="estado">{{ estado }}</mat-option>
+                </mat-select>
+            </mat-form-field>
         </div>
     </div>
 
@@ -25,13 +50,15 @@
             <h2>Reservas</h2>
             <button class="new-reservation-btn" routerLink="/calendario">+ Nueva Reserva</button>
         </div>
+
         <table class="reservations-table">
             <thead>
                 <tr>
                     <th>Fecha</th>
-                    <th>Hora</th>
+                    <th>Horario</th>
                     <th>Cancha</th>
                     <th>Jugador</th>
+                    <th>Precio</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -39,22 +66,27 @@
             <tbody>
                 <tr *ngFor="let reserva of reservasFiltradas">
                     <td>{{ reserva.turno.fecha }}</td>
-                    <td>{{ reserva.turno.horarioInicio }}</td>
-                    <td>{{ reserva.turno.cancha }}</td>
-                    <td>{{ reserva.jugador.nombre }}</td>
+                    <td>{{ reserva.turno.horarioInicio }} - {{ reserva.turno.horario_fin }}</td>
+                    <td>{{ reserva.turno.cancha.numero }}</td>
+                    <td>{{ reserva.jugador.email }}</td>
+                    <td>{{ reserva.precio }}</td>
                     <td>
                         <span class="status" [ngClass]="{
-                            'confirmed': reserva.estado === 'Confirmado',
-                            'pending': reserva.estado === 'Pendiente'
-                        }">
+                        'status-pagada': reserva.estado === 'Pagada',
+                        'status-cancelled': reserva.estado === 'Cancelada'
+                    }">
                             {{ reserva.estado }}
                         </span>
                     </td>
                     <td>
-                        <button class="delete-btn" (click)="cancelarReserva(reserva.id)">🗑</button>
+                        <button class="delete-btn" (click)="cancelarReserva(reserva.id)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
                     </td>
                 </tr>
             </tbody>
+
         </table>
     </div>
+
 </div>

@@ -3,6 +3,7 @@ package Grupo11.Seminario.Service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +53,13 @@ public class ReservaService {
     public List<Reserva> buscar_reservas(Integer jugador_id){
         return i_reserva_repository.findByJugadorId(jugador_id);
     }
+
+    public List<Reserva> buscar_todas_reservas() {
+        List<Reserva> reservas = new ArrayList<>();
+        i_reserva_repository.findAll().forEach(reservas::add);
+        return reservas;
+    }
+
 
     public Cancha buscar_cancha(Integer numero_cancha){
         return i_cancha_repository.findByNumero(numero_cancha).get();

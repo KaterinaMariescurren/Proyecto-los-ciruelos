@@ -83,7 +83,7 @@ public class ReservaController {
 
                             if (empleado!=null){
                                 reserva.setEmpleado(empleado);
-                                reserva.setEstado(EstadoReserva.Pendiente);
+                                reserva.setEstado(EstadoReserva.Pagada);
                                 // Se busca la cancha
                                 Cancha cancha = reserva_service.buscar_cancha(reservaDTO.getNumero_cancha());
         
@@ -192,10 +192,19 @@ public class ReservaController {
             return null;
     }
 
+    @GetMapping(path = "/consultar/todas_reservas")
+    public ResponseEntity<List<Reserva>> consultarTodasReservas(@RequestParam String email){
+        Integer id_empleado = usuarioService.buscar_usuario(email).get().getId();
+        if (reserva_service.existe_empleado(id_empleado)){
+            return ResponseEntity.ok(reserva_service.buscar_todas_reservas());
+        }
+            return null;
+    }
+
     @PutMapping(path = "/cancelar/reserva")
     public ResponseEntity<String> cancelarReserva(@RequestParam String email, @RequestParam Integer id_reserva){
         Integer id_accionar = usuarioService.buscar_usuario(email).get().getId();
-        if (reserva_service.existe_jugador(id_accionar)){
+        if (reserva_service.existe_jugador(id_accionar) || reserva_service.existe_empleado(id_accionar)){
             Optional<Reserva> optReserva = reserva_service.buscar_reserva(id_reserva);
             if (optReserva.isPresent()) {
                 Reserva reserva = optReserva.get();

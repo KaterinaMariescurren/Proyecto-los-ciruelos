@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { AuthService } from './services/auth.service';
-import { Observable, switchMap, throwError } from 'rxjs';
+import { catchError, Observable, switchMap, throwError } from 'rxjs';
 
 export interface Reserva {
   id_cancha: number;
@@ -112,20 +112,6 @@ export class ApiService {
     );
   }
 
-  cancelarReserva(reserva_id: number): Observable<string> {
-    return this.authService.getUserEmail().pipe(
-      switchMap(email => {
-        if (!email) {
-          console.error("Error: No se encontró un email válido.");
-          return throwError(() => new Error("No hay usuario autenticado"));
-        }
-
-        const url = `${this.apiUrl}public/cancelar/reserva?email=${encodeURIComponent(email)}&id_reserva=${reserva_id}`;
-        return this.http.put<string>(url, null);
-      })
-    );
-  }
-
   getTurnos(): Observable<Reserva[]> {
     return this.http.get<Reserva[]>(this.apiUrl + "public/consultar_turnos")
   }
@@ -176,7 +162,7 @@ export class ApiService {
         const rol = response.message;
         console.log("🔍 Rol obtenido en getUsuarios:", rol);
 
-        if (rol !== 'duenio') {
+        if (rol !== 'duenio' && rol !== 'empleado') {
           console.error("Acceso denegado: Solo el dueño puede ver los usuarios.");
           return throwError(() => new Error("No autorizado"));
         }
@@ -261,6 +247,7 @@ export class ApiService {
     return this.http.put(url, {}, { responseType: 'text' });
   }
 
+
   asignarRolSocio(email: string, jugadorId: number): Observable<any> {
     const url = `${this.apiUrl}public/asociar_jugador?id_jugador=${jugadorId}&email=${encodeURIComponent(email)}`;
     return this.http.put(url, {}, { responseType: 'text' });
@@ -271,4 +258,32 @@ export class ApiService {
     return this.http.put(url, {}, { responseType: 'text' });
   }
 
+  getTodasReservas(): Observable<any[]> {
+    return this.authService.getUserEmail().pipe(
+      switchMap(email => {
+        if (!email) {
+          console.error("Error: No se encontró un email válido.");
+          return throwError(() => new Error("No hay usuario autenticado"));
+        }
+        const url = `${this.apiUrl}public/consultar/todas_reservas?email=${encodeURIComponent(email)}`;
+        return this.http.get<any[]>(url);
+      })
+    );
+  }
+
+  cancelarReserva(reserva_id: number): Observable<string> {
+    return this.authService.getUserEmail().pipe(
+      switchMap(email => {
+        if (!email) {
+          console.error("Error: No se encontró un email válido.");
+          return throwError(() => new Error("No hay usuario autenticado"));
+        }
+  
+        const url = `${this.apiUrl}public/cancelar/reserva?email=${encodeURIComponent(email)}&id_reserva=${reserva_id}`;
+        return this.http.put(url, null, { responseType: 'text' }); // 👈 Esto evita el error de JSON
+      })
+    );
+  }  
+  
+  
 }

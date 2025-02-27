@@ -66,7 +66,7 @@ const routes: Routes = [
   { path: 'consultar_usuarios', component: ConsultarUsuariosComponent  },
   { path: 'modificar_valores', component: ModificarValoresComponent },
   { path: 'consultar-empleado', component: ConsultarEmpleadoComponent },
-  { path: 'register-jugador', component: RegisterComponent}, //registro que hace el dueño
+  { path: 'register-jugador', component: RegisterComponent}, 
 
   // , canActivate: [roleGuard], data: { role: 'duenio' }
 

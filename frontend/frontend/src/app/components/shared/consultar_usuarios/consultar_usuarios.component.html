@@ -42,9 +42,9 @@
     </div>
   </div>
 
-   <!-- Encabezado de la Tabla -->
-   <div class="header">
-    <h2 class="titulo">Jugador</h2>
+  <!-- Encabezado de la Tabla -->
+  <div class="header">
+    <h2>Jugador</h2>
     <div class="btn-container">
       <button class="new-player-btn">+ Nuevo Jugador</button>
     </div>
@@ -73,33 +73,22 @@
       <ng-container matColumnDef="socio">
         <th mat-header-cell *matHeaderCellDef> Socio </th>
         <td mat-cell *matCellDef="let usuario">
-          <span 
-  [ngClass]="{'yes': usuario.socio, 'no': !usuario.socio}" 
-  (click)="usuario.socio ? abrirModalDesasociar(usuario) : abrirModal(usuario, 'socio')"
-  style="cursor: pointer;">
-  {{ usuario.socio ? 'Sí' : 'No' }}
-</span>
+          <span [ngClass]="{'yes': usuario.socio, 'no': !usuario.socio}"
+            (click)="usuario.socio ? abrirModalDesasociar(usuario) : abrirModal(usuario, 'socio')"
+            style="cursor: pointer;">
+            {{ usuario.socio ? 'Sí' : 'No' }}
+          </span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="profesor">
         <th mat-header-cell *matHeaderCellDef> Profesor </th>
         <td mat-cell *matCellDef="let usuario">
-          <span 
-            [ngClass]="{'yes': usuario.profesor, 'no': !usuario.profesor}" 
-            (click)="abrirModal(usuario, 'profesor')"
+          <span [ngClass]="{'yes': usuario.profesor, 'no': !usuario.profesor}"
+            (click)="usuario.profesor ? abrirModalDesasignarRolProfesor(usuario) : abrirModal(usuario, 'profesor')"
             style="cursor: pointer;">
             {{ usuario.profesor ? 'Sí' : 'No' }}
           </span>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef> Acciones </th>
-        <td mat-cell *matCellDef="let usuario">
-          <button mat-icon-button color="warn" (click)="eliminarUsuario(usuario.id)">
-            🗑
-          </button>
         </td>
       </ng-container>
 
@@ -137,13 +126,9 @@
 <div class="modal-overlay" *ngIf="mostrarModalDesasignarRolProfesor">
   <div class="modal-container">
     <h2>¿Desea desasignarle el rol Profesor?</h2>
-
     <div class="modal-actions">
       <button class="modal-btn confirm" (click)="confirmarDesasignarRolProfesor()">Sí</button>
       <button class="modal-btn cancel" (click)="cerrarModalDesasignarRolProfesor()">No</button>
     </div>
   </div>
 </div>
-
-
-

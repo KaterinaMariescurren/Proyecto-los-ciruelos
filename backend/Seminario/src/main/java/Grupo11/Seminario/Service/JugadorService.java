@@ -43,7 +43,7 @@ public class JugadorService {
         return false;
     }
 
-    // Asignar rol de profesor a un jugador
+    // Quitar rol de profesor a un jugador
     public Boolean desasignar_rol_profesor(Integer jugador_id) {
         Jugador jugador = i_jugador_repository.findById(jugador_id).orElse(null);
         if (jugador != null) {

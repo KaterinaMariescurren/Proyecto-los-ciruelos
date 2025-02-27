@@ -44,10 +44,10 @@ public class JugadorController {
         return ResponseEntity.badRequest().body("El usuario no es un empleado");
     }
 
-    // Asigna el rol de profesor a un jugador
+        // Quitar rol de profesor a un jugador
     @PutMapping("/desasignar_profesor/{jugador_id}")
     public ResponseEntity<String> desasignarRolProfesor(@RequestParam String email ,@PathVariable Integer jugador_id) {
-        Boolean exito = jugadorService.asignar_rol_profesor(jugador_id);
+        Boolean exito = jugadorService.desasignar_rol_profesor(jugador_id); 
 
         Integer duenio_id = usuarioService.buscar_usuario(email).get().getId();
         if (empleadoService.existe_empleado(duenio_id)) {
@@ -55,14 +55,15 @@ public class JugadorController {
             if (vduenio) {
             
                 if (exito) {
-                    return ResponseEntity.ok("Rol de profesor asignado exitosamente al jugador.");
+                    return ResponseEntity.ok("Rol de profesor eliminado exitosamente del jugador.");
                 } else {
-                    return ResponseEntity.badRequest().body("Error al asignar el rol de profesor.");
+                    return ResponseEntity.badRequest().body("Error al quitar el rol de profesor.");
                 }
             }
             return ResponseEntity.badRequest().body("Error al verificar que se sea un dueño");   
         }
         return ResponseEntity.badRequest().body("El usuario no es un empleado");
     }
+
 }
 

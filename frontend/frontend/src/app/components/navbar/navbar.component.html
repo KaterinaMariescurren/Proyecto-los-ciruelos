@@ -1,5 +1,5 @@
 <!-- NAVBAR para usuarios normales (empleados) -->
-<nav *ngIf="rol !== 'duenio'" class="navbar">
+<nav *ngIf="rol !== 'duenio' && rol !== 'empleado'" class="navbar">
   <div class="navbar__container">
     <a routerLink="/" class="navbar-logo"></a>
 
@@ -22,15 +22,15 @@
   </div>
 </nav>
 
-<!-- SIDEBAR para dueños -->
-<aside *ngIf="rol === 'duenio'" class="sidebar">
+<!-- SIDEBAR para dueños y empleados -->
+<aside *ngIf="rol === 'duenio' || rol === 'empleado'" class="sidebar">
   <div class="sidebar-header">
     <div routerLink="/home" class="sidebar-logo"></div>
     <button class="sidebar-close" (click)="logout()">Cerrar Sesión</button>
   </div>
 
   <ul class="sidebar-menu">
-    <li>
+    <li *ngIf="rol === 'duenio'">
       <button routerLink="/modificar_valores" type="button">Configuración General</button>
     </li>
     <li>
@@ -39,9 +39,9 @@
     <li>
       <button routerLink="/consultar_reservas" type="button">Reservas</button>
     </li>
-    <li>
+    <!-- Mostrar opción "Empleados" solo si el rol es "duenio" -->
+    <li *ngIf="rol === 'duenio'">
       <button routerLink="/consultar-empleado" type="button">Empleados</button>
     </li>
-
   </ul>
 </aside>
