@@ -1,4 +1,4 @@
-<div *ngIf="rol !== 'duenio'"class="form">
+<div *ngIf="rol !== 'duenio' && rol !== 'empleado'"class="form">
   <div class="form__container">
     <h1>Reserva</h1>
 
@@ -57,7 +57,7 @@
 </div>
 
 <!-- Si el rol es "dueño" y hay jugadores seleccionados -->
-<div *ngIf="rol === 'duenio'" class="form">
+<div *ngIf="rol === 'duenio' || rol === 'empleado'" class="form">
   <div class="form__container">
     <h1>Reserva</h1>
 

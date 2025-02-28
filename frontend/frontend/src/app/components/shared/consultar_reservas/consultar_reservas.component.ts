@@ -22,7 +22,7 @@ export class ConsultarReservasComponent {
   };
 
   canchas: string[] = ["1", "2", "3", "4"];
-  estados: string[] = ["Pendiente", "Confirmado", "Cancelado", "Expirado"];
+  estados: string[] = [ "Pagada", "Cancelada", "Expirado", "Señado"];
   horarios: string[] = this.generarHorarios();
   horariosFiltrados: string[] = [...this.horarios];
 
@@ -41,7 +41,7 @@ export class ConsultarReservasComponent {
   generarHorarios(): string[] {
     let horarios = [];
     for (let h = 0; h < 24; h++) {
-      for (let m = 0; m < 60; m += 15) {
+      for (let m = 0; m < 60; m += 30) {
         let hora = h.toString().padStart(2, '0');
         let minutos = m.toString().padStart(2, '0');
         horarios.push(`${hora}:${minutos}`);

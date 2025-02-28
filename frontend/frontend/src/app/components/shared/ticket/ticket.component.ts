@@ -195,7 +195,7 @@ export class TicketComponent {
     const seniaValue = this.senia === "seña" ? true : false;
     this.senia === "total" ? false : 
     (() => { throw new Error('Valor de senia no válido'); })();
-    if (this.rol === "duenio"){
+    if (this.rol === 'duenio' || this.rol === 'empleado'){
       const reservaDTO: ReservaDTO = {
         cantidad_pelotas: this.cantidad_paletas,
         cantidad_paletas: this.cantidad_pelotas,

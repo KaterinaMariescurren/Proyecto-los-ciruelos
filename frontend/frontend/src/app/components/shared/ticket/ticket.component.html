@@ -1,4 +1,4 @@
-<div class="center-wrapper">    
+<div class="center-wrapper">
     <div class="ticket-container">
         <h1 class="ticket-title">Los Ciruelos Padel Club</h1>
         <p class="ticket-address">Calle 34 entre 25 y 26, La Plata, Provincia de Buenos Aires. Argentina</p>
@@ -12,13 +12,15 @@
                 <span class="ticket-detail">{{ date }}</span>
             </div>
 
-            <div class="ticket-item">
+            <!-- Solo mostrar si el usuario es "duenio" -->
+            <div class="ticket-item" *ngIf="rol === 'duenio' || rol === 'empleado'">
                 <span>
                     <mat-icon class="person-icon">person</mat-icon>
                     Jugador
                 </span>
                 <span class="ticket-detail">{{ jugador.email }}</span>
             </div>
+
 
             <div class="ticket-item">
                 <span>
@@ -68,12 +70,12 @@
         </div>
 
         <!-- Mostrar botón solo si el rol es "duenio" -->
-        <div *ngIf="rol === 'duenio'" class="button-container">
+        <div *ngIf="rol === 'duenio' || rol === 'empleado'" class="button-container">
             <button mat-raised-button type="submit" class="submit-button" (click)="reservar()">Reservar</button>
         </div>
 
         <!-- Solo mostrar el contenedor de Mercado Pago si no es "duenio" -->
-        <div *ngIf="rol !== 'duenio'" id="wallet_container"></div>
-        
+        <div *ngIf="rol !== 'duenio' && rol !== 'empleado'" id="wallet_container"></div>
+
     </div>
 </div>
