@@ -34,9 +34,10 @@ import Grupo11.Seminario.Entities.Enum.EstadoReserva;
 import Grupo11.Seminario.Entities.Enum.EstadoTurno;
 import Grupo11.Seminario.Service.ReservaService;
 import Grupo11.Seminario.Service.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping(path = "/public")
+@RequestMapping(path = "/private")
 public class ReservaController {
 
     @Autowired
@@ -46,8 +47,9 @@ public class ReservaController {
     
     @PostMapping(path = "/reservas/reservar_turno")
     public ResponseEntity<?> reservar_turno
-    (@RequestParam String email, @RequestBody ReservaDTO reservaDTO) throws JsonMappingException, JsonProcessingException{
-        
+    (HttpServletRequest request, @RequestBody ReservaDTO reservaDTO) throws JsonMappingException, JsonProcessingException{
+        String email = (String) request.getAttribute("email");
+
         Integer id_jugador=0;
         Integer id_empleado=0;
     
@@ -184,7 +186,9 @@ public class ReservaController {
     }
 
     @GetMapping(path = "/consultar/reservas")
-    public ResponseEntity<List<Reserva>> consultarReservas(@RequestParam String email){
+    public ResponseEntity<List<Reserva>> consultarReservas(HttpServletRequest request){
+        String email = (String) request.getAttribute("email");
+
         Integer id_accionar = usuarioService.buscar_usuario(email).get().getId();
         if (reserva_service.existe_jugador(id_accionar) | reserva_service.existe_empleado(id_accionar)){
             return ResponseEntity.ok(reserva_service.buscar_reservas(id_accionar));
@@ -193,7 +197,9 @@ public class ReservaController {
     }
 
     @GetMapping(path = "/consultar/todas_reservas")
-    public ResponseEntity<List<Reserva>> consultarTodasReservas(@RequestParam String email){
+    public ResponseEntity<List<Reserva>> consultarTodasReservas(HttpServletRequest request){
+        String email = (String) request.getAttribute("email");
+
         Integer id_empleado = usuarioService.buscar_usuario(email).get().getId();
         if (reserva_service.existe_empleado(id_empleado)){
             return ResponseEntity.ok(reserva_service.buscar_todas_reservas());
@@ -202,7 +208,9 @@ public class ReservaController {
     }
 
     @PutMapping(path = "/cancelar/reserva")
-    public ResponseEntity<String> cancelarReserva(@RequestParam String email, @RequestParam Integer id_reserva){
+    public ResponseEntity<String> cancelarReserva(HttpServletRequest request, @RequestParam Integer id_reserva){
+        String email = (String) request.getAttribute("email");
+
         Integer id_accionar = usuarioService.buscar_usuario(email).get().getId();
         if (reserva_service.existe_jugador(id_accionar) || reserva_service.existe_empleado(id_accionar)){
             Optional<Reserva> optReserva = reserva_service.buscar_reserva(id_reserva);

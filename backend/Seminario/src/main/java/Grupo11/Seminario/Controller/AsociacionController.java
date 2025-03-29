@@ -9,13 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import Grupo11.Seminario.DTO.AsociacionDTO;
 import Grupo11.Seminario.DTO.PagoMercadoPagoDTO;
 import Grupo11.Seminario.Entities.Asociacion;
 import Grupo11.Seminario.Entities.ConfiguracionGeneral;
@@ -30,7 +28,7 @@ import Grupo11.Seminario.Service.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping(path = "/public")
+@RequestMapping(path = "/private")
 public class AsociacionController {
 
     @Autowired
@@ -43,8 +41,9 @@ public class AsociacionController {
     UsuarioService usuarioService;
     
     @PutMapping(path = "/asociar_jugador")
-    public ResponseEntity<?> asociar_jugador(@RequestParam String email , @RequestParam Integer id_jugador) throws JsonMappingException, JsonProcessingException{
-    
+    public ResponseEntity<?> asociar_jugador(HttpServletRequest request , @RequestParam Integer id_jugador) throws JsonMappingException, JsonProcessingException{
+        String email = (String) request.getAttribute("email");
+
         Integer id_duenio = usuarioService.buscar_usuario(email).get().getId();
         ConfiguracionGeneral configuracion_general = configuracion_general_service.get_configuracion_general();
 
@@ -82,7 +81,9 @@ public class AsociacionController {
     }
 
     @PutMapping(path = "/asociarse")
-    public ResponseEntity<Map<String, String>> asociarse(@RequestParam String email , @RequestParam Long id_mp) throws JsonMappingException, JsonProcessingException{
+    public ResponseEntity<Map<String, String>> asociarse(HttpServletRequest request , @RequestParam Long id_mp) throws JsonMappingException, JsonProcessingException{
+        String email = (String) request.getAttribute("email");
+
         Map<String, String> response2 = new HashMap<>();
         Integer id_jugador = usuarioService.buscar_usuario(email).get().getId();
 
@@ -140,7 +141,9 @@ public class AsociacionController {
     }
     
     @PutMapping(path = "/desasociarse")
-    public ResponseEntity<?> desasociarse(@RequestParam String email) {
+    public ResponseEntity<?> desasociarse(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
+
         Integer id_jugador = usuarioService.buscar_usuario(email).get().getId();
 
         if (asociacion_service.existe_jugador(id_jugador)) {
@@ -157,7 +160,9 @@ public class AsociacionController {
     }
 
     @PutMapping(path = "/desasociar_jugador")
-    public ResponseEntity<?> desasociarse(@RequestParam String email , @RequestParam Integer id_jugador) {
+    public ResponseEntity<?> desasociarse(HttpServletRequest request , @RequestParam Integer id_jugador) {
+        String email = (String) request.getAttribute("email");
+
         Integer id_duenio = usuarioService.buscar_usuario(email).get().getId();
         // Se busca si existe el empleado
         if (asociacion_service.existe_empleado(id_duenio) ){

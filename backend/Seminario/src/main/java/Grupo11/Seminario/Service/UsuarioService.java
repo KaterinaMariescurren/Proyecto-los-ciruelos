@@ -19,4 +19,8 @@ public class UsuarioService {
     public Optional<Usuario> buscar_usuario(String email){
         return i_usuario_repository.findByEmail(email);
     }
+
+    public Boolean verificar_email(String email){
+        return i_usuario_repository.findByEmail(email).isPresent();
+    }
 }

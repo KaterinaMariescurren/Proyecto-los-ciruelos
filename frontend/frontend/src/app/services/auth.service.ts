@@ -120,12 +120,14 @@ export class AuthService {
       });
   }
 
-  async getToken(): Promise<string> {
+  // Obtener el ID Token de Firebase
+  async getIdToken(): Promise<string> {
     const user = this.auth.currentUser;
     if (user) {
-      return await user.getIdToken();
+      return await user.getIdToken(); // Obtén el token
+    } else {
+      throw new Error('No hay usuario conectado');
     }
-    throw new Error('No hay usuario conectado');
   }
 
   async loginWithGoogleProvider(): Promise<UserCredential> {

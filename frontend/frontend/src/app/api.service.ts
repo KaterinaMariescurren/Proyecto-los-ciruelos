@@ -1,13 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { AuthService } from './services/auth.service';
-import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import { catchError, from, Observable, switchMap, throwError } from 'rxjs';
 
 export interface Reserva {
   id_cancha: number;
   fecha: string;
   horario_inicio_ocupado: string;  // Hora de inicio
   horario_fin_ocupado: string;    // Hora de finalización
+}
+
+interface VerificarUsuarioResponse {
+  registrado: boolean;
 }
 
 export interface TurnoDTO {
@@ -74,14 +78,20 @@ export class ApiService {
   constructor(private http: HttpClient, private authService: AuthService) { }
 
   getPerfil(): Observable<any> {
-    return this.authService.getUserEmail().pipe(
-      switchMap(email => {
-        if (!email) {
-          console.error("Error: No se encontró un email válido.");
-          return throwError(() => new Error("No hay usuario autenticado"));
+    return from(this.authService.getIdToken()).pipe(  // Aquí usamos 'from' para convertir la promesa en un observable
+      switchMap(token => {
+        if (!token) {
+          console.error("Error: No se encontró un token válido.");
+          return throwError(() => new Error("No hay token de usuario"));
         }
-        const url = `${this.apiUrl}public/consultar_perfil?email=${encodeURIComponent(email)}`;
-        return this.http.get<any>(url);
+        const url = `${this.apiUrl}private/consultar_perfil`;
+        
+        // Enviar la solicitud con el token en el encabezado "Authorization"
+        const headers = {
+          'Authorization': `Bearer ${token}` // Aquí se envía el token en el encabezado
+        };
+  
+        return this.http.get<any>(url, { headers });
       })
     );
   }
@@ -134,9 +144,13 @@ export class ApiService {
     );
   }
 
-  registrarUsuario(jugadorDTO: JugadorDTO): Observable<any> {
+  registrarUsuario(jugadorDTO: JugadorDTO, password: string): Observable<any> {
     const url = `${this.apiUrl}public/registro/jugador`;
-    return this.http.post<any>(url, jugadorDTO);
+    return this.http.post<any>(url, jugadorDTO, {params: { password:password } });
+  }
+
+  verificarUsuario(email: string) {
+    return this.http.get<VerificarUsuarioResponse>(`http://localhost:8080/public/usuarios/verificar-usuario/${email}`);
   }
 
   registrarEmpleado(emailUsuario: string, empleadoDTO: EmpleadoDTO): Observable<any> {

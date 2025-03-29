@@ -12,20 +12,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import Grupo11.Seminario.Entities.Empleado;
 import Grupo11.Seminario.Service.EmpleadoService;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
-@RequestMapping(path = "/public")
+@RequestMapping(path = "/private")
 public class EmpleadoController {
     
     @Autowired
     EmpleadoService empleadoService;
 
     @GetMapping("/verificar/empleado")
-    public ResponseEntity<Map<String, String>> verificarEmpleado(@RequestParam String email) {
+    public ResponseEntity<Map<String, String>> verificarEmpleado(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
+
         Optional<Empleado> empleado = empleadoService.buscarPorEmail(email);
     
         Map<String, String> response = new HashMap<>();

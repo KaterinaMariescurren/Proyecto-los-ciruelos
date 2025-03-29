@@ -80,7 +80,6 @@ export class RegisterComponent implements OnInit {
     if (email && password) {
       const credential: Credential = { email, password };
       try {
-        await this.authService.registerWithEmailAndPassword(credential);
   
         // Datos a enviar al backend
         const jugadorDTO: JugadorDTO = {
@@ -100,13 +99,13 @@ export class RegisterComponent implements OnInit {
         };
   
         // Llamar al servicio para registrar el usuario en el backend
-        this.apiService.registrarUsuario(jugadorDTO).subscribe({
+        this.apiService.registrarUsuario(jugadorDTO, password).subscribe({
           next: () => {
             this.toastrService.success('Registro exitoso', 'Éxito');
             this.router.navigate(['/login']);
           },
           error: (error) => {
-            console.error('Error al registrar en el backend:', error);
+            console.error('Error al registrarse:', error);
             this.toastrService.error('Error al registrar en el backend', 'Error');
           }
         });

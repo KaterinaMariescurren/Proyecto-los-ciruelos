@@ -3,17 +3,17 @@ package Grupo11.Seminario.Controller;
 import Grupo11.Seminario.Service.EmpleadoService;
 import Grupo11.Seminario.Service.JugadorService;
 import Grupo11.Seminario.Service.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/public/jugadores")
+@RequestMapping("/private/jugadores")
 public class JugadorController {
 
     @Autowired
@@ -25,7 +25,9 @@ public class JugadorController {
 
     // Asigna el rol de profesor a un jugador
     @PutMapping("/asignar_profesor/{jugador_id}")
-    public ResponseEntity<String> asignarRolProfesor(@RequestParam String email ,@PathVariable Integer jugador_id) {
+    public ResponseEntity<String> asignarRolProfesor(HttpServletRequest request ,@PathVariable Integer jugador_id) {
+        String email = (String) request.getAttribute("email");
+
         Boolean exito = jugadorService.asignar_rol_profesor(jugador_id);
 
         Integer duenio_id = usuarioService.buscar_usuario(email).get().getId();
@@ -46,7 +48,9 @@ public class JugadorController {
 
         // Quitar rol de profesor a un jugador
     @PutMapping("/desasignar_profesor/{jugador_id}")
-    public ResponseEntity<String> desasignarRolProfesor(@RequestParam String email ,@PathVariable Integer jugador_id) {
+    public ResponseEntity<String> desasignarRolProfesor(HttpServletRequest request ,@PathVariable Integer jugador_id) {
+        String email = (String) request.getAttribute("email");
+
         Boolean exito = jugadorService.desasignar_rol_profesor(jugador_id); 
 
         Integer duenio_id = usuarioService.buscar_usuario(email).get().getId();

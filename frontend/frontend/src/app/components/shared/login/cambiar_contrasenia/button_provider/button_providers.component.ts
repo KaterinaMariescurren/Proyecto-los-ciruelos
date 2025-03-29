@@ -33,24 +33,46 @@ export class ButtonProviders {
   }
 
   signInWithGoogle(): void {
-    this.isGoogleSignInInProgress = true; 
-
+    this.isGoogleSignInInProgress = true;
+  
     this.authService.loginWithGoogleProvider().then(async (userData) => {
       if (userData) {
         console.log('Inicio de sesión exitoso con Google:', userData);
-
+  
         const email = userData.user.email;
-        const name = userData.user.displayName;
+        const name = userData.user.displayName; // Obtener el nombre
+        
+        if (!email) {
+          console.error("El email obtenido de Google es nulo.");
+          this.toastrService.error("No se pudo obtener el email de Google.");
+          return;
+        }
+  
+        // Verificar si el usuario existe en el backend
+        this.api.verificarUsuario(email).subscribe((response: any) => {
+          if (response.registrado) {
 
-        //Verificar si el email esta registrado en el Backend, si lo esta redireccionar al home, sino al postregister
+            // Obtener el rol y almacenarlo
+            this.api.getRol().subscribe(roleData => {
+              this.api.setRolInStorage(roleData.message);
+              console.log("Rol guardado:", roleData.message);
+            });
 
-        // Obtener el rol y almacenarlo
-        this.api.getRol().subscribe(roleData => {
-          this.api.setRolInStorage(roleData.message);
-          console.log("Rol guardado:", roleData.message);
+            console.log('Usuario registrado, redirigiendo al home');
+            this.router.navigate(["/home"], { replaceUrl: true });
+            return;
+          } else {
+            console.log('Usuario no registrado, redirigiendo a postregister');
+            this.router.navigate(["/postregister"], {
+              queryParams: { email, name }, // ✅ Pasar email y nombre como parámetros
+              replaceUrl: true
+            });
+            return;
+          }
+        }, error => {
+          console.error("Error al verificar usuario:", error);
+          this.toastrService.error("Error al verificar usuario, intenta de nuevo.");
         });
-
-        this.router.navigate(["/home"],{ replaceUrl: true });
       }
     })
     .catch((error) => {
@@ -58,9 +80,10 @@ export class ButtonProviders {
       this.errorMessages.push('Error durante el inicio de sesión con Google. Intenta nuevamente.');
     })
     .finally(() => {
-      this.isGoogleSignInInProgress = false; 
+      this.isGoogleSignInInProgress = false;
     });
   }
+  
 
   fillFormWithGoogleData(userData: any): void {
     this.form.patchValue({

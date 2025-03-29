@@ -1,6 +1,9 @@
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { ApiService, JugadorDTO } from '../../../../api.service';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-postregister',
@@ -15,104 +18,116 @@ export class PostRegisterComponent implements OnInit {
   maxPhones = 4;
   errorMessages: string[] = [];
 
-  email: string | null = null; // Para almacenar el token de Firebase
-  name: string | null = null; // Para almacenar el token de Firebase
+  email: string | null = null;
+  name: string | null = null;
+  lastName: string | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private apiService: ApiService,
+    private toastrService: ToastrService,
+    private authService: AuthService
   ) {
-    // Inicialización del formulario
     this.form = this.formBuilder.group({
-      phones: this.formBuilder.array([ 
-        this.formBuilder.control('', {
-          validators: [Validators.required, Validators.pattern(/^\d{6,15}$/)],
-          nonNullable: true,
-        }),
+      phones: this.formBuilder.array([
+        this.createPhoneControl()
       ]),
-      playerCategory: this.formBuilder.control('', {
-        validators: Validators.required,
-        nonNullable: true,
-      }),
+      playerCategory: ['', Validators.required]
     });
   }
 
   ngOnInit(): void {
-    // Obtener parámetros desde la URL
     this.activatedRoute.queryParams.subscribe(params => {
       this.email = params['email'] || '';
-      this.name = params['name'] || '';
+      const fullName = params['name'] ? params['name'].trim().split(/\s+/) : [];
+    
+      this.name = fullName.length > 0 ? fullName[0] : ''; // Primer nombre
+      this.lastName = fullName.length > 1 ? fullName.slice(1).join(' ') : '';
     });
   }
 
+  // Getter para los teléfonos
   get phones(): FormArray {
     return this.form.get('phones') as FormArray;
   }
 
+  // Función para crear un control de teléfono
+  createPhoneControl(): any {
+    return this.formBuilder.control('', [
+      Validators.required,
+      Validators.pattern(/^\d{6,15}$/),
+    ]);
+  }
+
+  // Función para agregar un teléfono
+  addPhone(): void {
+    if (this.phones.length < this.maxPhones) {
+      this.phones.push(this.createPhoneControl());
+    }
+  }
+
+  // Función para eliminar un teléfono
+  removePhone(index: number): void {
+    if (this.phones.length > 1) {
+      this.phones.removeAt(index);
+    }
+  }
+
+  // Envía los datos al backend
   submit(): void {
     if (this.form.invalid) {
       this.markAllAsTouched();
       return;
     }
-  
+
     const phones = this.phones.value;
     const playerCategory = this.form.get('playerCategory')?.value;
-  
-    console.log('Datos del postregistro:', { phones, playerCategory });
-    alert('Datos guardados correctamente.');
-    // Enviar los datos al backend para registrarlos
-    this.router.navigate(['/login']);
+    const email = this.email;
+    const name = this.name;
+
+    if (!email || !name) {
+      console.error("Faltan datos esenciales (email o nombre) para registrar al usuario.");
+      return;
+    }
+
+    // Construcción del objeto JugadorDTO
+    const jugadorDTO: JugadorDTO = {
+      id: 0,
+      nombre: name,
+      apellido: "", // No se obtiene de Google, opcional
+      email: email,
+      categoria: playerCategory,
+      socio: false,
+      profesor: false,
+      telefonos: phones.map((phone: string) => ({
+        codigo: 0,
+        numero: parseInt(phone, 10),
+      })),
+    };
+
+    console.log('Enviando datos del postregistro:', jugadorDTO);
+
+    this.apiService.registrarUsuario(jugadorDTO, "").subscribe({
+      next: () => {
+        this.toastrService.success('Registro exitoso', 'Éxito');
+        this.router.navigate(['/login']);
+      },
+      error: (error) => {
+        console.error('Error al registrar usuario:', error);
+        this.toastrService.error('Error al registrar en el backend', 'Error');
+      }
+    });
   }
 
-    // Función para marcar todos los campos como tocados
-    markAllAsTouched(): void {
-      Object.keys(this.form.controls).forEach((controlName) => {
-        const control = this.form.get(controlName);
-        if (control) {
-          control.markAsTouched();
-        }
-      });
-    }
-
-  addPhone(): void {
-    if (this.phones.length < this.maxPhones) {
-      this.phones.push(
-        this.formBuilder.control('', {
-          validators: [Validators.required, Validators.pattern(/^\d{6,15}$/)],
-          nonNullable: true,
-        })
-      );
-    }
-  }
-
-  removePhone(index: number): void {
-    if (this.phones.length > 1) {
-      this.phones.removeAt(index); 
-    } else {
-      this.phones.at(0).setValue(''); 
-    }
-  }
-
-  getFormErrors(): string[] {
-    const messages: string[] = [];
-    const controls = this.form.controls;
-  
-    // Verificar la categoría de jugador
-    if (controls['playerCategory'].invalid) {
-      messages.push('Debe seleccionar una categoría de jugador.');
-    }
-  
-    // Verificar si los teléfonos están vacíos o son inválidos
-    if (this.phones.length < 1) {
-      messages.push('Debe agregar al menos un número de teléfono.');
-    } else {
-      this.phones.controls.forEach((control, index) => {
-        if (control.invalid && control.value) {
-          messages.push(`Número de teléfono ${index + 1} inválido.`);
-        }
-      });
-    }
-    return messages;
+  // Función para marcar todos los campos como tocados
+  markAllAsTouched(): void {
+    Object.keys(this.form.controls).forEach((controlName) => {
+      const control = this.form.get(controlName);
+      if (control) {
+        control.markAsTouched();
+      }
+    });
   }
 }

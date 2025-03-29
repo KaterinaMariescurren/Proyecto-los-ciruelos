@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import Grupo11.Seminario.Service.ConsultaUsuarioService;
 import Grupo11.Seminario.Service.UsuarioService;
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "/public/consultar")

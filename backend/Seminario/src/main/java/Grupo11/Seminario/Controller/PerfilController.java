@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import Grupo11.Seminario.DTO.EmpleadoDTO;
 import Grupo11.Seminario.DTO.JugadorDTO;
@@ -21,7 +20,7 @@ import Grupo11.Seminario.Service.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping(path = "/public")
+@RequestMapping(path = "/private")
 public class PerfilController {
 
     @Autowired
@@ -30,7 +29,9 @@ public class PerfilController {
     UsuarioService usuario_service;
     
     @GetMapping(path = "/consultar_perfil")
-    public ResponseEntity<?> consultar_perfil(@RequestParam String email){
+    public ResponseEntity<?> consultar_perfil(HttpServletRequest request){
+        String email = (String) request.getAttribute("email");
+
         Integer id_usuario = usuario_service.buscar_usuario(email).get().getId();
         
         Empleado empleado = perfil_service.buscar_empleado(id_usuario);
@@ -54,8 +55,9 @@ public class PerfilController {
     }
 
     @PutMapping(path = "/modificar_perfil")
-    public ResponseEntity<?> modificar_perfil(@RequestParam String email, @RequestBody UsuarioDTO usuarioDTO){
-    
+    public ResponseEntity<?> modificar_perfil(HttpServletRequest request, @RequestBody UsuarioDTO usuarioDTO){
+        String email = (String) request.getAttribute("email");
+
         Optional<Usuario> usuario = usuario_service.buscar_usuario(email);
         Integer id_usuario=usuario.get().getId();
         
