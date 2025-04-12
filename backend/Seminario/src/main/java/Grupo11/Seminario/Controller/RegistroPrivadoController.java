@@ -7,7 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
+
 import Grupo11.Seminario.DTO.EmpleadoDTO;
 import Grupo11.Seminario.Entities.Empleado;
 import Grupo11.Seminario.Entities.Usuario;
@@ -20,13 +26,16 @@ import jakarta.servlet.http.HttpServletRequest;
 public class RegistroPrivadoController {
     
     @Autowired
+    private FirebaseAuth firebaseAuth;
+
+    @Autowired
     RegistroService registro_service;
     @Autowired
     UsuarioService usuarioService;
 
     // Controlador privado para registrar a un empleado en la aplicacion
     @PostMapping(path = "/registro/empleado")
-    public ResponseEntity<?> registro_empleado(HttpServletRequest request , @RequestBody EmpleadoDTO empleadoDTO){
+    public ResponseEntity<?> registro_empleado(HttpServletRequest request , @RequestBody EmpleadoDTO empleadoDTO, @RequestParam(required = false) String password) throws FirebaseAuthException{
         String email = (String) request.getAttribute("email");
 
         Optional<Usuario> usuario = usuarioService.buscar_usuario(email);
@@ -46,6 +55,15 @@ public class RegistroPrivadoController {
 
                     empleado.setTelefonos(empleadoDTO.getTelefonos());
                     empleado.setDuenio(empleadoDTO.getDuenio());
+
+                    UserRecord.CreateRequest requestCreateRequest = new UserRecord.CreateRequest()
+                            .setEmail(empleadoDTO.getEmail())
+                            .setEmailVerified(true) 
+                            .setPassword(password)
+                            .setDisplayName(empleadoDTO.getNombre() + " " + empleadoDTO.getApellido());
+    
+                    // Crear usuario en Firebase
+                    firebaseAuth.createUser(requestCreateRequest);
 
                     registro_service.guardar_empleado(empleado);
 

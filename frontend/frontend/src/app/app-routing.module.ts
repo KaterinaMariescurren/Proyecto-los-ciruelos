@@ -47,7 +47,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent, canActivate: [noAuthGuard] },
   { path: 'postregister', component: PostRegisterComponent, canActivate: [noAuthGuard] },
   { path: 'reestablecer-contrasenia', component: ReestablecerContraseniaComponent, canActivate: [noAuthGuard] },
-  { path: 'verificar-correo', component: VerificarCorreoComponent, canActivate: [noAuthGuard] },
+  { path: 'verifyEmail', component: VerificarCorreoComponent, canActivate: [noAuthGuard] },
   { path: 'profesores', component: ProfesoresComponent }, 
   { path: 'beneficios', component: BeneficiosSociosComponent },
   { path: 'calendario', component: ReservasDuenioComponent},

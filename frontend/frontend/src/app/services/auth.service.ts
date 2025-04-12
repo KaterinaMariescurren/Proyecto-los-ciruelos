@@ -5,22 +5,18 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   authState,
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   User,
   sendPasswordResetEmail,
-  EmailAuthProvider,
   updatePassword,
-  reauthenticateWithCredential,
   sendEmailVerification,
-  fetchSignInMethodsForEmail,
 } from '@angular/fire/auth';
 import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { applyActionCode, getAuth, getRedirectResult, onAuthStateChanged, signInWithRedirect, signOut } from 'firebase/auth';
-import { HttpClient, HttpParams } from '@angular/common/http';  // Importamos HttpClient para las solicitudes HTTP
+import { applyActionCode, getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { HttpClient } from '@angular/common/http';  // Importamos HttpClient para las solicitudes HTTP
 
 export interface Credential {
   email: string;
@@ -71,25 +67,11 @@ export class AuthService {
     }
   }
 
-  registerWithEmailAndPassword(credential: Credential): Promise<UserCredential> {
-    return createUserWithEmailAndPassword(this.auth, credential.email, credential.password)
-      .then(async (userCredential) => {
-        if (userCredential.user) {
-          this.enviarEmailVerification(userCredential);
-        }
-        return userCredential;
-      })
-      .catch(error => {
-        throw error;
-      });
-  }
-
   async verifyEmailWithCode(oobCode: string): Promise<void> {
-    const auth = getAuth();
     try {
+      const auth = getAuth();
       await applyActionCode(auth, oobCode);
-      console.log('Correo electrónico verificado');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al verificar el correo electrónico:', error);
       throw error;
     }
@@ -102,15 +84,13 @@ export class AuthService {
         if (!userCredential.user?.emailVerified) {
           // Enviar nuevamente el correo de verificación
           sendEmailVerification(userCredential.user);
-
+          signOut(this.auth);
           // Lanzar un error con el código 'auth/email-not-verified'
           const error: any = new Error('Correo no verificado');
           error.code = 'auth/email-not-verified'; // Definir el código de error Firebase
           throw error;
         }
         localStorage.setItem('user', JSON.stringify(this.user)); // Guarda el usuario en localStorage
-
-        this.toastrService.success("Bienvenido de nuevo! Nos alegra verte otra vez.", "Exito");
 
         return userCredential;
       })
@@ -147,12 +127,11 @@ export class AuthService {
     if (user && !user.emailVerified) {
       try {
         const actionCodeSettings = {
-          url: 'https://proyecto-los-ciruelos.firebaseapp.com/__/auth/action',
+          url: 'http://localhost:4200/verificar-correo', 
           handleCodeInApp: true,
         };
 
         await sendEmailVerification(user, actionCodeSettings);
-        this.toastrService.info("Correo de verificación enviado. Revisa tu correo electronico.", "Verificación requerida");
       } catch (error) {
         console.error('Error al enviar el correo de verificación:', error);
         this.toastrService.error("Error al enviar el correo de verificación. Inténtalo nuevamente.", "Error");

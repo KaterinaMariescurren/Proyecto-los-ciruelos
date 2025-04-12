@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -77,9 +78,9 @@ public class RegistroPublicoController {
                             .setDisplayName(jugadorDTO.getNombre() + " " + jugadorDTO.getApellido());
     
                     // Crear usuario en Firebase
-                    firebaseAuth.createUser(request);
+                    firebaseAuth.createUser(request);  
                 }
-    
+
                 // Guardar el jugador en la base de datos
                 registro_service.guardar_jugador(jugador);
     

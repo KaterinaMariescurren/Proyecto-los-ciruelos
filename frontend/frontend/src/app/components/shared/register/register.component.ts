@@ -101,7 +101,8 @@ export class RegisterComponent implements OnInit {
         // Llamar al servicio para registrar el usuario en el backend
         this.apiService.registrarUsuario(jugadorDTO, password).subscribe({
           next: () => {
-            this.toastrService.success('Registro exitoso', 'Éxito');
+            this.authService.loginWithEmailAndPassword(credential);
+            this.toastrService.success('Registro exitoso, verifique su email', 'Éxito');
             this.router.navigate(['/login']);
           },
           error: (error) => {
