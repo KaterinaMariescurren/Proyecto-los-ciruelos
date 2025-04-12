@@ -101,7 +101,7 @@ export class RegisterEmpleadoComponent implements OnInit {
           this.apiService.registrarEmpleado(duenioEmail, EmpleadoDTO).subscribe({
             next: () => {
               this.toastrService.success('Registro exitoso', 'Éxito');
-              this.router.navigate(['/']);
+              this.router.navigate(['/home']);
             },
             error: (error) => {
               console.error('Error al registrar en el backend:', error);
@@ -116,8 +116,6 @@ export class RegisterEmpleadoComponent implements OnInit {
       }
     }
   }
-
-
 
   // Función para crear un control de teléfono
   createPhoneControl(): any {

@@ -153,10 +153,20 @@ export class ApiService {
     return this.http.get<VerificarUsuarioResponse>(`http://localhost:8080/public/usuarios/verificar-usuario/${email}`);
   }
 
-  registrarEmpleado(emailUsuario: string, empleadoDTO: EmpleadoDTO): Observable<any> {
-    const url = `${this.apiUrl}public/registro/empleado?email=${encodeURIComponent(emailUsuario)}`;
-    return this.http.post<any>(url, empleadoDTO);
-  }
+  registrarEmpleado(password: string, empleadoDTO: EmpleadoDTO): Observable<any> {
+    const url = `${this.apiUrl}private/registro/empleado`;
+  
+    return from(this.authService.getIdToken()).pipe( // 👈 usamos tu método ya definido
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        const params = new HttpParams().set('password', password);
+  
+        return this.http.post<any>(url, empleadoDTO, { headers, params });
+      })
+    );
+  }  
 
   asociarse(id_mp: number): Observable<any> {
     return this.authService.getUserEmail().pipe(
@@ -208,14 +218,14 @@ export class ApiService {
   }
 
   getRol(): Observable<{ message: string }> {
-    return this.authService.getUserEmail().pipe(
-      switchMap(email => {
-        if (!email) {
-          console.error("Error: No se encontró un email válido.");
-          return throwError(() => new Error("No hay usuario autenticado"));
-        }
-        const url = `${this.apiUrl}public/verificar/empleado?email=${email}`;
-        return this.http.get<{ message: string }>(url);
+    const url = `${this.apiUrl}private/verificar/empleado`;
+    return from(this.authService.getIdToken()).pipe( // 👈 usamos tu método ya definido
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+  
+        return this.http.get<any>(url, { headers });
       })
     );
   }
