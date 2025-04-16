@@ -13,10 +13,9 @@ import { catchError, map, Observable, throwError } from 'rxjs';
 })
 export class NavbarComponent implements OnInit {
   currentUrl: string = '';
-  isLoggedIn: boolean = false;
+  isLoggedIn$!: Observable<boolean>;
   rol: string | null = null;
   email: string | null = null;
-  rol$!: Observable<string>;
 
   constructor(
     private router: Router,
@@ -32,28 +31,12 @@ export class NavbarComponent implements OnInit {
         this.currentUrl = event.url;
       }
     });
-  
-    this.authService.getUsuario().subscribe(user => {
-      this.isLoggedIn = !!user;
-      console.log("Usuario autenticado:", this.isLoggedIn);
-  
-      if (this.isLoggedIn) {
-        this.apiService.getRol().subscribe(response => {
-          this.rol = response.message; // Ahora puede ser "duenio", "empleado" o null
-          console.log('Rol asignado:', this.rol);
-  
-          this.apiService.setRolInStorage(this.rol);
-          this.cdRef.detectChanges(); // Forzar actualización del Navbar/Sidebar
-        });
-      } else {
-        this.rol = null;
-        this.apiService.setRolInStorage("");
-        this.cdRef.detectChanges();
-      }
+    this.apiService.getRolObservable().subscribe(rol => {
+      this.rol = rol;
+      this.cdRef.detectChanges(); // Refrescar la vista si hace falta
     });
+    this.isLoggedIn$ = this.authService.isAuthenticated$();
   }
-  
-  
 
   navigateOrScroll(sectionId: string) {
     if (this.currentUrl !== '/') {

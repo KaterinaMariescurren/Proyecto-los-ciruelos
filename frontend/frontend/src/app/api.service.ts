@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { AuthService } from './services/auth.service';
-import { catchError, from, Observable, switchMap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, from, Observable, switchMap, throwError } from 'rxjs';
 
 export interface Reserva {
   id_cancha: number;
@@ -74,6 +74,8 @@ export interface EmpleadoDTO {
 })
 export class ApiService {
   private apiUrl = 'http://localhost:8080/'; // Reemplaza con tu URL de backend
+  private rolSubject = new BehaviorSubject<string | null>(this.getRolFromStorage());
+
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -110,14 +112,20 @@ export class ApiService {
   }
 
   getResrvas(): Observable<any[]> {
-    return this.authService.getUserEmail().pipe(
-      switchMap(email => {
-        if (!email) {
-          console.error("Error: No se encontró un email válido.");
-          return throwError(() => new Error("No hay usuario autenticado"));
+    return from(this.authService.getIdToken()).pipe(  // Aquí usamos 'from' para convertir la promesa en un observable
+      switchMap(token => {
+        if (!token) {
+          console.error("Error: No se encontró un token válido.");
+          return throwError(() => new Error("No hay token de usuario"));
         }
-        const url = `${this.apiUrl}public/consultar/reservas?email=${encodeURIComponent(email)}`;
-        return this.http.get<any[]>(url);
+        const url = `${this.apiUrl}private/consultar/reservas`;
+        
+        // Enviar la solicitud con el token en el encabezado "Authorization"
+        const headers = {
+          'Authorization': `Bearer ${token}` // Aquí se envía el token en el encabezado
+        };
+  
+        return this.http.get<any[]>(url, { headers });
       })
     );
   }
@@ -132,14 +140,20 @@ export class ApiService {
   }
 
   hacerReserva(reservaDTO: ReservaDTO): Observable<any> {
-    return this.authService.getUserEmail().pipe(
-      switchMap(email => {
-        if (!email) {
-          console.error("Error: No se encontró un email válido.");
-          return throwError(() => new Error("No hay usuario autenticado"));
+    return from(this.authService.getIdToken()).pipe(  // Aquí usamos 'from' para convertir la promesa en un observable
+      switchMap(token => {
+        if (!token) {
+          console.error("Error: No se encontró un token válido.");
+          return throwError(() => new Error("No hay token de usuario"));
         }
-        const url = `${this.apiUrl}public/reservas/reservar_turno?email=${encodeURIComponent(email)}`;
-        return this.http.post<any>(url, reservaDTO);
+        const url = `${this.apiUrl}private/reservas/reservar_turno`;
+        
+        // Enviar la solicitud con el token en el encabezado "Authorization"
+        const headers = {
+          'Authorization': `Bearer ${token}` // Aquí se envía el token en el encabezado
+        };
+  
+        return this.http.post<any>(url, reservaDTO, { headers });
       })
     );
   }
@@ -163,7 +177,7 @@ export class ApiService {
         });
         const params = new HttpParams().set('password', password);
   
-        return this.http.post<any>(url, empleadoDTO, { headers, params });
+        return this.http.post<any>(url, empleadoDTO, { headers:headers, params:params });
       })
     );
   }  
@@ -184,7 +198,6 @@ export class ApiService {
     return this.getRol().pipe(
       switchMap(response => {
         const rol = response.message;
-        console.log("🔍 Rol obtenido en getUsuarios:", rol);
 
         if (rol !== 'duenio' && rol !== 'empleado') {
           console.error("Acceso denegado: Solo el dueño puede ver los usuarios.");
@@ -198,7 +211,6 @@ export class ApiService {
               return throwError(() => new Error("Email no disponible"));
             }
 
-            console.log("📩 Enviando email_usuario en la petición:", email);
             const url = `${this.apiUrl}public/consultar/usuarios/buscar?email_usuario=${email}`;
 
             return this.http.get<UsuarioDTO[]>(url);
@@ -214,7 +226,22 @@ export class ApiService {
   }
 
   updateConfiguracion(email: string, nuevaConfiguracion: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}configuracion_general/public/actualizar_configuracion?email=${email}`, nuevaConfiguracion);
+    return from(this.authService.getIdToken()).pipe(
+      switchMap(token => {
+        if (!token) {
+          console.error("Error: No se encontró un token válido.");
+          return throwError(() => new Error("No hay token de usuario"));
+        }
+        const url = `${this.apiUrl}configuracion_general/private/actualizar_configuracion`;
+        const headers = {
+          'Authorization': `Bearer ${token}`
+        };
+  
+        return this.http.put<any>(url, nuevaConfiguracion, {
+          headers: headers, 
+        });
+      })
+    );
   }
 
   getRol(): Observable<{ message: string }> {
@@ -231,11 +258,16 @@ export class ApiService {
   }
 
   setRolInStorage(rol: string) {
-    localStorage.setItem('userRole', rol); // O sessionStorage si prefieres
+    localStorage.setItem('rol', rol); // O sessionStorage si prefieres
+    this.rolSubject.next(rol); // Notificar a los subscriptores
+  }
+
+  getRolObservable() {
+    return this.rolSubject.asObservable();
   }
 
   getRolFromStorage(): string | null {
-    return localStorage.getItem('userRole');
+    return localStorage.getItem('rol');
   }
 
   getUsuariosFiltrados(busqueda: string, filtro: any): Observable<UsuarioDTO[]> {
@@ -262,52 +294,92 @@ export class ApiService {
   }
 
   asignarRolProfesor(email: string, jugadorId: number): Observable<any> {
-    const url = `${this.apiUrl}public/jugadores/asignar_profesor/${jugadorId}?email=${encodeURIComponent(email)}`;
-    return this.http.put(url, {}, { responseType: 'text' });
+    const url = `${this.apiUrl}private/jugadores/asignar_profesor/${jugadorId}`;
+    return from(this.authService.getIdToken()).pipe( // 👈 usamos tu método ya definido
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+  
+        return this.http.put(url, {}, { responseType: 'text', headers:headers });
+      })
+    );
   }
 
   sacarRolProfesor(email: string, jugadorId: number): Observable<any> {
-    const url = `${this.apiUrl}public/jugadores/desasignar_profesor/${jugadorId}?email=${encodeURIComponent(email)}`;
-    return this.http.put(url, {}, { responseType: 'text' });
+    const url = `${this.apiUrl}private/jugadores/desasignar_profesor/${jugadorId}`;
+    return from(this.authService.getIdToken()).pipe( // 👈 usamos tu método ya definido
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+  
+        return this.http.put(url, {}, { responseType: 'text', headers:headers });
+      })
+    );
   }
 
-
   asignarRolSocio(email: string, jugadorId: number): Observable<any> {
-    const url = `${this.apiUrl}public/asociar_jugador?id_jugador=${jugadorId}&email=${encodeURIComponent(email)}`;
-    return this.http.put(url, {}, { responseType: 'text' });
+    const url = `${this.apiUrl}private/asociar_jugador?id_jugador=${jugadorId}`;
+    return from(this.authService.getIdToken()).pipe( // 👈 usamos tu método ya definido
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+  
+        return this.http.put(url, {}, { responseType: 'text', headers:headers });
+      })
+    );
   }
 
   sacarRolSocio(email: string, jugadorId: number): Observable<any> {
-    const url = `${this.apiUrl}public/desasociar_jugador?id_jugador=${jugadorId}&email=${encodeURIComponent(email)}`;
-    return this.http.put(url, {}, { responseType: 'text' });
-  }
+    const url = `${this.apiUrl}private/desasociar_jugador?id_jugador=${jugadorId}`;
+    return from(this.authService.getIdToken()).pipe( // 👈 usamos tu método ya definido
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+  
+        return this.http.put(url, {}, { responseType: 'text', headers:headers });
+      })
+    );  }
 
   getTodasReservas(): Observable<any[]> {
-    return this.authService.getUserEmail().pipe(
-      switchMap(email => {
-        if (!email) {
-          console.error("Error: No se encontró un email válido.");
-          return throwError(() => new Error("No hay usuario autenticado"));
+    return from(this.authService.getIdToken()).pipe(  // Aquí usamos 'from' para convertir la promesa en un observable
+      switchMap(token => {
+        if (!token) {
+          console.error("Error: No se encontró un token válido.");
+          return throwError(() => new Error("No hay token de usuario"));
         }
-        const url = `${this.apiUrl}public/consultar/todas_reservas?email=${encodeURIComponent(email)}`;
-        return this.http.get<any[]>(url);
+        const url = `${this.apiUrl}private/consultar/todas_reservas`;
+        
+        // Enviar la solicitud con el token en el encabezado "Authorization"
+        const headers = {
+          'Authorization': `Bearer ${token}` // Aquí se envía el token en el encabezado
+        };
+  
+        return this.http.get<any[]>(url, { headers });
       })
     );
   }
 
   cancelarReserva(reserva_id: number): Observable<string> {
-    return this.authService.getUserEmail().pipe(
-      switchMap(email => {
-        if (!email) {
-          console.error("Error: No se encontró un email válido.");
-          return throwError(() => new Error("No hay usuario autenticado"));
+    return from(this.authService.getIdToken()).pipe(
+      switchMap(token => {
+        if (!token) {
+          console.error("Error: No se encontró un token válido.");
+          return throwError(() => new Error("No hay token de usuario"));
         }
+        const url = `${this.apiUrl}private/cancelar/reserva?id_reserva=${reserva_id}`;
+        const headers = {
+          'Authorization': `Bearer ${token}`
+        };
   
-        const url = `${this.apiUrl}public/cancelar/reserva?email=${encodeURIComponent(email)}&id_reserva=${reserva_id}`;
-        return this.http.put(url, null, { responseType: 'text' }); // 👈 Esto evita el error de JSON
+        return this.http.put<string>(url, null, {
+          headers: headers, 
+        });
       })
     );
   }  
-  
-  
+
 }

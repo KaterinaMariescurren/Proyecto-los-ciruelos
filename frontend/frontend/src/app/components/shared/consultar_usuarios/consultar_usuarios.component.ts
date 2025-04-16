@@ -50,19 +50,16 @@ export class ConsultarUsuariosComponent {
     this.apiService.getRol().subscribe({
       next: (data: any) => {
         this.rol = data.message;
-        console.log("Rol obtenido:", this.rol);
 
         this.cdRef.detectChanges();
 
         if (this.rol === 'duenio' || this.rol === 'empleado') {
           this.apiService.getUsuarios().subscribe({
             next: (usuarios) => {
-              console.log("Usuarios obtenidos del backend:", usuarios);
               
               // Filtrar solo los jugadores (sin rol de dueño)
               this.usuarios = usuarios.filter(usuario => !('duenio' in usuario));
               this.usuariosFiltrados = [...this.usuarios];
-              console.log("Usuarios filtrados (solo jugadores):", this.usuariosFiltrados);
             },
             error: (err) => {
               console.error("Error al obtener usuarios:", err);
@@ -82,7 +79,6 @@ export class ConsultarUsuariosComponent {
   eliminarUsuario(usuarioId: number): void {
     if (confirm("¿Está seguro de eliminar este usuario?")) {
       this.apiService.eliminarUsuario(usuarioId).subscribe(() => {
-        console.log("Usuario eliminado");
         this.obtenerUsuarios(); // Refresca la lista
       });
     }

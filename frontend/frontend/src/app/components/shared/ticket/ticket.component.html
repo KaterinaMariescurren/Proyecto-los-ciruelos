@@ -18,9 +18,8 @@
                     <mat-icon class="person-icon">person</mat-icon>
                     Jugador
                 </span>
-                <span class="ticket-detail">{{ jugador.email }}</span>
+                <span class="ticket-detail">{{ jugador?.email }}</span>
             </div>
-
 
             <div class="ticket-item">
                 <span>
@@ -75,7 +74,7 @@
         </div>
 
         <!-- Solo mostrar el contenedor de Mercado Pago si no es "duenio" -->
-        <div *ngIf="rol !== 'duenio' && rol !== 'empleado'" id="wallet_container"></div>
+        <div *ngIf="mostrarWallet" id="wallet_container" #walletContainer></div>
 
     </div>
 </div>

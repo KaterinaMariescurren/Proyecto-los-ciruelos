@@ -63,7 +63,6 @@ export class ConsultarReservasComponent {
       this.reservas = reservas;
       this.reservasFiltradas = [...this.reservas]; // Inicializar copia para filtros
       this.cdRef.detectChanges(); // Forzar actualización de la vista
-      console.log("Reservas obtenidas:", reservas);
     });
   }
 
@@ -74,9 +73,7 @@ export class ConsultarReservasComponent {
     if (!confirm("¿Estás seguro de que quieres cancelar esta reserva?")) {
       return;
     }
-  
-    console.log("Cancelando reserva:", reserva_id);
-  
+    
     this.apiService.cancelarReserva(reserva_id).subscribe({
       next: () => {
         this.toastrService.success("Reserva cancelada correctamente", "Éxito");

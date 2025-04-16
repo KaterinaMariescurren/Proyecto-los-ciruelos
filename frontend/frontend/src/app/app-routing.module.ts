@@ -45,7 +45,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [noAuthGuard] },
   { path: 'cambiar-contrasenia', component: CambiarContraseniaComponent, canActivate: [noAuthGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [noAuthGuard] },
-  { path: 'postregister', component: PostRegisterComponent, canActivate: [noAuthGuard] },
+  { path: 'postregister', component: PostRegisterComponent, canActivate: [authGuard] },
   { path: 'reestablecer-contrasenia', component: ReestablecerContraseniaComponent, canActivate: [noAuthGuard] },
   { path: 'verifyEmail', component: VerificarCorreoComponent, canActivate: [noAuthGuard] },
   { path: 'profesores', component: ProfesoresComponent }, 

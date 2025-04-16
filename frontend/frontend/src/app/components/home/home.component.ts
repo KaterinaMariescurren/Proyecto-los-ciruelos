@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ButtonProviders } from '../shared/login/cambiar_contrasenia/button_provider/button_providers.component'
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../api.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,7 @@ import { ApiService } from '../../api.service';
 })
 export class HomeComponent implements OnInit {
   rol: string | null = null;
-  isLoggedIn: boolean = false;
+  isLoggedIn$!: Observable<boolean>;
   currentUrl: string = '';
 
   email: string | null = null;
@@ -34,27 +35,11 @@ export class HomeComponent implements OnInit {
         this.currentUrl = event.url;
       }
     });
-
-    // Verificar si el usuario está autenticado
-    this.authService.getUsuario().subscribe(user => {
-      this.isLoggedIn = !!user;
-      console.log("Usuario autenticado:", this.isLoggedIn);
-
-      if (this.isLoggedIn) {
-        // Obtener el rol del usuario
-        this.apiService.getRol().subscribe(response => {
-          this.rol = response.message; // Puede ser "duenio", "empleado" o null
-          console.log('Rol asignado:', this.rol);
-
-          this.apiService.setRolInStorage(this.rol);
-          this.cdRef.detectChanges(); // Forzar actualización de la vista
-        });
-      } else {
-        this.rol = null;
-        this.apiService.setRolInStorage("");
-        this.cdRef.detectChanges();
-      }
+    this.apiService.getRolObservable().subscribe(rol => {
+      this.rol = rol;
+      this.cdRef.detectChanges(); // Refrescar la vista si hace falta
     });
+    this.isLoggedIn$ = this.authService.isAuthenticated$();
   }
 
   asociarse(): void {

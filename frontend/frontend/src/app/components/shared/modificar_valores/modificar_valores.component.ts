@@ -28,7 +28,6 @@ export class ModificarValoresComponent implements OnInit {
 
   ngOnInit(): void {
     this.authService.getUserEmail().subscribe((email) => {
-      console.log('📧 Email del dueño:', email);
       if (!email) {
         this.toastrService.error('No se pudo obtener el email del dueño', 'Error');
         return;
@@ -120,16 +119,13 @@ export class ModificarValoresComponent implements OnInit {
         horario_fin: dia.abierto ? dia.horario_fin : "00:00:00"
       }))
     };
-  
-    console.log("📤 Enviando configuración con email:", this.duenioEmail, nuevaConfiguracion);
-  
+    
     this.apiService.updateConfiguracion(this.duenioEmail, nuevaConfiguracion).subscribe({
       next: () => {
         this.toastrService.success('Configuración actualizada con éxito');
         this.originalValues = { ...this.form.value };
       },
       error: (error) => {
-        console.error('❌ Error al actualizar la configuración:', error);
         this.toastrService.error('Hubo un error al actualizar la configuración');
       }
     });

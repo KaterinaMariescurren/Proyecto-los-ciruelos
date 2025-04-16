@@ -62,7 +62,6 @@ export class ReservasDuenioComponent {
       this.isLoggedIn = !!user; // Si hay un usuario, isLoggedIn es true
     });
     this.api.getPerfil().subscribe((perfil) => {
-      console.log(perfil.socio);
       this.isSocio = perfil?.socio ?? false; // Si el campo "socio" es true, se guarda en isSocio
     });
   }
@@ -84,13 +83,9 @@ export class ReservasDuenioComponent {
 
   onButtonClick() {
     if (this.isLoggedIn) {
-      console.log(this.selectedCourt?.id);
-      console.log(this.selectedDate);
-      console.log(this.selectedSlot);
       const selectedDate = this.selectedDate; // Fecha seleccionada en el calendario
       const startTime = this.selectedSlot ?? ""; // El horario de inicio es el slot donde el usuario hace click
       const endTime = this.getEndTime(startTime); // El horario de fin será 90 minutos después
-      console.log(endTime);
 
       const turnoDTO: TurnoDTO = {
         id_cancha: this.selectedCourt?.id ?? 0, // Reemplaza con el ID de la cancha
@@ -103,7 +98,6 @@ export class ReservasDuenioComponent {
       this.api.bloquearTurno(turnoDTO).subscribe({
         next: (response) => {
           // Si la respuesta es exitosa, redirige a la página de ticket
-          console.log('Respuesta de la API:', response); // Verifica que la respuesta sea correcta
           if (response?.message === "Se bloqueo el turno") {
 
             this.router.navigate(['/reserva'], {
@@ -136,7 +130,6 @@ export class ReservasDuenioComponent {
           horario_fin_ocupado: turno.horario_fin_ocupado,
           fecha: turno.fecha
         }));
-        console.log('Reservas cargadas:', this.reservations);
       },
       (error) => {
         console.error('Error al cargar los turnos', error);

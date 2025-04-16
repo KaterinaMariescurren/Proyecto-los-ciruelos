@@ -40,8 +40,10 @@ export class AuthService {
   }
 
   // Método para verificar si el usuario está autenticado
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem('user');  // Verifica si el usuario está en localStorage
+  isAuthenticated$(): Observable<boolean> {
+    return this.authState$.pipe(
+      map(user => !!user)
+    );
   }
 
   // Método para hacer logout
@@ -101,14 +103,33 @@ export class AuthService {
   }
 
   // Obtener el ID Token de Firebase
-  async getIdToken(): Promise<string> {
-    const user = this.auth.currentUser;
-    if (user) {
-      return await user.getIdToken(); // Obtén el token
-    } else {
-      throw new Error('No hay usuario conectado');
-    }
+  getIdToken(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const subscription = this.authState$.pipe(
+        switchMap(user => {
+          if (user) {
+            return user.getIdToken();
+          } else {
+            return of(null);
+          }
+        })
+      ).subscribe({
+        next: (token) => {
+          subscription.unsubscribe();
+          if (token) {
+            resolve(token);
+          } else {
+            reject(new Error('No hay usuario conectado'));
+          }
+        },
+        error: (err) => {
+          subscription.unsubscribe();
+          reject(err);
+        }
+      });
+    });
   }
+  
 
   async loginWithGoogleProvider(): Promise<UserCredential> {
     const provider = new GoogleAuthProvider();
@@ -150,32 +171,5 @@ export class AuthService {
       map((user) => user?.email || null)
     );
   }
-
-  getUsuario(): Observable<User | null> {
-    return this.authState$;
-  }
-
-
-  getUserRole(): Observable<string | null> {
-    return this.authState$.pipe(
-      tap(user => console.log("🔍 Usuario autenticado en authState$:", user)), // <-- Agregar log aquí
-      switchMap((user) => {
-        if (!user) {
-          console.warn("⚠️ No hay usuario autenticado, retornando null");
-          return of(null);
-        }
-  
-        return this.http.get<{ message: string }>(`/public/verificar/empleado?email=${user.email}`).pipe(
-          tap(response => console.log("📢 Respuesta del backend:", response)), // <-- Verifica la respuesta del backend
-          map((response) => response.message),
-          catchError(error => {
-            console.error("⛔ Error al obtener el rol:", error);
-            return of(null);
-          })
-        );
-      })
-    );
-  }
-  
 
 }

@@ -83,7 +83,6 @@ export class ButtonProviders {
       this.isGoogleSignInInProgress = false;
     });
   }
-  
 
   fillFormWithGoogleData(userData: any): void {
     this.form.patchValue({

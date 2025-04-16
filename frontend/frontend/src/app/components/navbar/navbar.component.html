@@ -10,10 +10,10 @@
       <button routerLink="/profesores" type="button">Nuestros Profesores</button>
 
       <!-- Botón de login si no está autenticado -->
-      <button *ngIf="!isLoggedIn" routerLink="/login" type="button">Iniciar Sesión</button>
+      <button *ngIf="!(isLoggedIn$ | async)" routerLink="/login" type="button">Iniciar Sesión</button>
 
       <!-- Botones extra para usuarios autenticados -->
-      <ng-container *ngIf="isLoggedIn">
+      <ng-container *ngIf="isLoggedIn$ | async">
         <button routerLink="/mis-reservas" type="button">Mis reservas</button>
         <button routerLink="/perfil" type="button">Mi perfil</button>
         <button (click)="logout()" type="button">Cerrar Sesión</button>

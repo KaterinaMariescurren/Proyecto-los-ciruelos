@@ -43,34 +43,9 @@ export class ReservaComponent {
     private configuracionService: ConfiguracionService,
     private cdRef: ChangeDetectorRef,
   ) {
-    this.api.getPerfil().subscribe((perfil) => {
-      console.log(perfil.socio);
-      this.isSocio = perfil?.socio ?? false; // Si el campo "socio" es true, se guarda en isSocio
-
-    });
   }
 
   ngOnInit(): void {
-    this.api.getRol().subscribe({
-      next: (data: any) => {
-        this.rol = data.message;
-        this.obtenerUsuarios();
-        console.log("Rol obtenido:", this.rol);
-  
-        // Ahora que tenemos el rol, actualizamos la validación de jugadorSeleccionado si es necesario
-        if (this.rol === 'duenio' || this.rol === 'empleado') {
-          this.form.get('jugadorSeleccionado')?.setValidators([Validators.required]);
-          this.form.get('jugadorSeleccionado')?.updateValueAndValidity();
-        }
-  
-        this.cdRef.detectChanges();
-      },
-      error: (err) => {
-        this.rol = 'none';
-        console.error("Error al obtener el rol:", err);
-      }
-    });
-  
     // Inicialización del formulario sin validación en jugadorSeleccionado
     this.form = this.formBuilder.group({
       pelotas: [0, [Validators.required, Validators.min(0)]],
@@ -78,11 +53,26 @@ export class ReservaComponent {
       jugadorSeleccionado: [null] // La validación se agregará después si es necesario
     });
 
-    this.obtenerConfiguracion();
-  
-    // Escuchar cambios en el formulario para actualizar el precio
-    this.form.valueChanges.subscribe(() => {
-      this.calcularPrecio();
+    this.api.getRolObservable().subscribe(rol => {
+      this.rol = rol;
+      this.obtenerUsuarios();
+      // Ahora que tenemos el rol, actualizamos la validación de jugadorSeleccionado si es necesario
+      if (this.rol === 'duenio' || this.rol === 'empleado') {
+        this.form.get('jugadorSeleccionado')?.setValidators([Validators.required]);
+        this.form.get('jugadorSeleccionado')?.updateValueAndValidity();
+      }
+
+      this.cdRef.detectChanges(); // Refrescar la vista si hace falta
+    });
+
+    this.api.getPerfil().subscribe((perfil) => {
+      this.isSocio = perfil?.socio ?? false; // Si el campo "socio" es true, se guarda en isSocio
+      this.obtenerConfiguracion();
+
+      // Escuchar cambios en el formulario para actualizar el precio
+      this.form.valueChanges.subscribe(() => {
+        this.calcularPrecio();
+      });
     });
   
     this.route.queryParams.subscribe(params => {
@@ -92,17 +82,14 @@ export class ReservaComponent {
       this.horario_fin_ocupado = params['horario_fin_ocupado'];
     });
   }
-  
 
   obtenerUsuarios(): void {
     if (this.rol === 'duenio' || this.rol === 'empleado') {
       this.api.getUsuarios().subscribe({
         next: (usuarios) => {
-          console.log("Usuarios obtenidos del backend:", usuarios);
 
           // Filtrar solo los jugadores (sin rol de dueño)
           this.usuariosFiltrados = usuarios.filter(usuario => !('duenio' in usuario) && !('empleado' in usuario));
-          console.log("Usuarios filtrados (solo jugadores):", this.usuariosFiltrados);
         },
         error: (err) => {
           console.error("Error al obtener usuarios:", err);
@@ -111,11 +98,9 @@ export class ReservaComponent {
     }
   }
 
-  // Agregar un método que permita seleccionar un jugador
   seleccionarJugador(): void {
     this.calcularPrecio();
   }
-
 
   obtenerConfiguracion(): void {
     // Primero revisamos si ya tenemos la configuración almacenada
@@ -177,15 +162,10 @@ export class ReservaComponent {
     }
 
     const formValues = this.form.value;
-    console.log("Pelotas:", formValues.pelotas);
-    console.log("Paletas:", formValues.paletas);
-    console.log("Precio total:", this.precio);
 
     if (this.rol === 'duenio' || this.rol === 'empleado') {
       this.jugadorSeleccionado = this.form.get('jugadorSeleccionado')?.value;
       this.pago = "total";
-      console.log("Pago:", this.pago);
-      console.log("Jugador seleccionado:", this.jugadorSeleccionado.email);
     }
 
     this.router.navigate(['/ticket'], {

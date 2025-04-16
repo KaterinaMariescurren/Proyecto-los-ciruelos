@@ -47,7 +47,7 @@
     <span>Blindex y sintético | Con iluminación | Techada</span><br />
   </div>
   <div class="option" (click)="onButtonClick()">1h 30min $
-    {{ isLoggedIn && isSocio
+    {{ isLoggedIn$ && isSocio
       ? (configuracion?.monto_reserva ?? 0) - ((configuracion?.monto_reserva ?? 0) * (configuracion?.descuento_socio ?? 0))
       : (configuracion?.monto_reserva ?? 0) }}  
   </div>

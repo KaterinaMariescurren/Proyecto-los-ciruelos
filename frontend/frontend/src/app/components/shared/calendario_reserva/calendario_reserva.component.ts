@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ApiService, Reserva, TurnoDTO } from '../../../api.service';
 import { Router } from '@angular/router';
 import { ConfiguracionGeneral, ConfiguracionService } from '../../../services/configuracion-general.service';
+import { Observable } from 'rxjs';
 
 export interface Court {
   id: number;
@@ -40,7 +41,7 @@ export class CalendarioReservaComponent implements OnInit {
   ];
 
   reservations: Reserva[] = [];
-  isLoggedIn: boolean = false;
+  isLoggedIn$!: Observable<boolean>;
   isSocio: boolean = false;
 
   showOptionsMenu = false;
@@ -61,15 +62,7 @@ export class CalendarioReservaComponent implements OnInit {
     private api: ApiService,  
     private router: Router,
     private configuracionService: ConfiguracionService,
-  ) {
-    this.authService.authState$.subscribe(user => {
-      this.isLoggedIn = !!user; // Si hay un usuario, isLoggedIn es true
-    });
-    this.api.getPerfil().subscribe((perfil) => {
-      console.log(perfil.socio);
-      this.isSocio = perfil?.socio ?? false; // Si el campo "socio" es true, se guarda en isSocio
-    });
-  }
+  ) {}
 
   ngOnInit() {
     this.cargarRerservaciones();
@@ -84,10 +77,19 @@ export class CalendarioReservaComponent implements OnInit {
         this.configuracion = config;
       });
     }
+    this.isLoggedIn$ = this.authService.isAuthenticated$();
+    this.isLoggedIn$.subscribe(isLogged => {
+      if (isLogged) {
+        this.api.getPerfil().subscribe((perfil) => {
+          console.log(perfil.socio);
+          this.isSocio = perfil?.socio ?? false;
+        });
+      }
+    });
   }
 
   onButtonClick() {
-    if (this.isLoggedIn) {
+    if (this.isLoggedIn$) {
       console.log(this.selectedCourt?.id);
       console.log(this.selectedDate);
       console.log(this.selectedSlot);

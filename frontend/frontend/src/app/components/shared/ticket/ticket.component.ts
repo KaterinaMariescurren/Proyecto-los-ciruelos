@@ -1,18 +1,21 @@
-import { ChangeDetectorRef, Component, Input } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfiguracionGeneral, ConfiguracionService } from '../../../services/configuracion-general.service';
 import { MercadopagoService } from '../../../services/mercadopago.service';
 import { AuthService } from '../../../services/auth.service';
 import { ApiService, ReservaDTO } from '../../../api.service';
 import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-ticket',
   templateUrl: './ticket.component.html',
   styleUrl: './ticket.component.css'
 })
-export class TicketComponent {
+export class TicketComponent implements AfterViewInit{
   @Input() esAsociacion: boolean = false; // Nuevo: Saber si es para asociación
+  @ViewChild('walletContainer') walletContainer!: ElementRef;
+
 
   date!: string;
   court?: string;
@@ -25,6 +28,8 @@ export class TicketComponent {
   horario_fin_ocupado: string = "";
   informacion!: string;
   rol: string | null = null;
+  mostrarWallet: boolean = false;
+  isLoggedIn$!: Observable<boolean>;
 
   configuracion: ConfiguracionGeneral | null = null;
 
@@ -40,18 +45,23 @@ export class TicketComponent {
     
   ) { }
 
-  ngOnInit(): void {
-    this.api.getRol().subscribe({
-      next: (data: any) => {
-        this.rol = data.message; 
-        console.log("Rol obtenido:", this.rol); // <-- Agrega este log
-        this.cdRef.detectChanges();
+  private mpCargado = false;
 
-      },
-      error: (err) => {
-        this.rol = 'none';
-        console.error("Error al obtener el rol:", err);
+  ngAfterViewInit(): void {
+    if (this.mostrarWallet && !this.mpCargado) {
+      const container = document.getElementById('wallet_container');
+      if (container) {
+        this.redirectToMercadoPago();
+        this.mpCargado = true;
       }
+    }
+  }
+
+  ngOnInit(): void {
+    this.api.getRolObservable().subscribe(rol => {
+      this.rol = rol;
+      this.mostrarWallet = rol !== 'duenio' && rol !== 'empleado';
+      this.cdRef.detectChanges(); // Refrescar la vista si hace falta
     });
 
     this.configuracion = this.configuracionService.getStoredConfiguracion();
@@ -92,27 +102,8 @@ export class TicketComponent {
         this.horario_fin_ocupado = params['horario_fin_ocupado'];
         this.informacion = 'Detalles sobre la cancha';
         this.jugador = JSON.parse(params['jugador']); 
-        console.log(this.jugador);
-      }
-
-      // Verificar si el usuario está autenticado antes de proceder con el pago
-      if (!this.authService.isAuthenticated()) {
-        // Si el usuario no está autenticado, redirigirlo al login
-        this.router.navigate(['/login']);
-      } else {
-        // Si está autenticado, proceder con la creación de la preferencia
-        this.redirectToMercadoPago();
       }
     });
-
-    // Verificar si el usuario está autenticado antes de proceder con el pago
-    if (!this.authService.isAuthenticated()) {
-      // Si el usuario no está autenticado, redirigirlo al login
-      this.router.navigate(['/login']);
-    } else {
-      // Si está autenticado, proceder con la creación de la preferencia
-      this.redirectToMercadoPago();
-    }
   }
 
   goHome(): void {
@@ -175,6 +166,11 @@ export class TicketComponent {
   }
 
   loadMercadoPago(preferenceId: string) {
+    const container = document.getElementById('wallet_container');
+    if (!container) {
+      console.error('wallet_container no está en el DOM todavía');
+      return;
+    }
     const mp = new (window as any).MercadoPago('APP_USR-762225fb-73cd-4033-b1ad-4b16b6f579da', {
       locale: 'es-AR'
     });
@@ -210,7 +206,6 @@ export class TicketComponent {
       this.api.hacerReserva(reservaDTO).subscribe({
         next: (response) => {
           // Si la respuesta es exitosa, redirige a la página de ticket
-          console.log('Respuesta de la API:', response); // Verifica que la respuesta sea correcta
           this.router.navigate(['/home']);
           this.toastrService.success('Se reservo el turno con exito.', 'Reserva');
         },

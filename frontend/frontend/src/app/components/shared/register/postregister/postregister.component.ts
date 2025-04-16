@@ -112,6 +112,11 @@ export class PostRegisterComponent implements OnInit {
     this.apiService.registrarUsuario(jugadorDTO, "").subscribe({
       next: () => {
         this.toastrService.success('Registro exitoso', 'Éxito');
+        // Obtener el rol y almacenarlo
+        this.apiService.getRol().subscribe(roleData => {
+          this.apiService.setRolInStorage(roleData.message);
+          console.log("Rol guardado:", roleData.message);
+        });
         this.router.navigate(['/login']);
       },
       error: (error) => {

@@ -98,7 +98,7 @@ export class RegisterEmpleadoComponent implements OnInit {
             })),
           };
 
-          this.apiService.registrarEmpleado(duenioEmail, EmpleadoDTO).subscribe({
+          this.apiService.registrarEmpleado(password, EmpleadoDTO).subscribe({
             next: () => {
               this.toastrService.success('Registro exitoso', 'Éxito');
               this.router.navigate(['/home']);
