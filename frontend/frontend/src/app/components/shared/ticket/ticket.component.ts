@@ -112,57 +112,23 @@ export class TicketComponent implements AfterViewInit{
 
   // Función para redirigir al usuario a Mercado Pago
   redirectToMercadoPago() {
-    if (this.esAsociacion) {
       if (this.configuracion) {
-        const preference = {
-          items: [
-            {
-              title: 'Asociación - Los Ciruelos Padel Club',
-              quantity: 1,
-              unit_price:parseFloat(this.configuracion.monto_asociacion.toString()),
-              currency_id: 'ARS',
-            }
-          ],
-          back_urls: {
-            success: `http://localhost:4200/procesar-pago?asociacion=true`,
-            failure: 'http://localhost:4200/ticket',
-            pending: 'http://localhost:4200/ticket'
-          },
-          auto_return: 'approved',
+        const preferenceData ={
+          title: this.esAsociacion ? 'Asociación - Los Ciruelos Padel Club' 
+            : 'Reserva cancha - Los Ciruelos Padel Club',
+          price: this.esAsociacion ? parseFloat(this.configuracion.monto_asociacion.toString()) 
+            : parseFloat(this.price.toString()),
+          successUrl: this.esAsociacion ? 
+            `http://localhost:4200/procesar-pago?asociacion=true` 
+            : `http://localhost:4200/procesar-pago?date=${this.date}&horario_inicio_ocupado=${this.horario_inicio_ocupado}&court=${this.court}&price=${this.price}&senia=${this.senia}&horario_fin_ocupado=${this.horario_fin_ocupado}`,
+          failureUrl: 'http://localhost:4200/ticket',
+          pendingUrl: 'http://localhost:4200/ticket',
         };
-  
-        this.mercadopagoService.createPreference(preference).subscribe(response => {
-          this.loadMercadoPago(response.id);
-        }, error => {
-          console.error('Error creando la preferencia:', error);
-        });
-      }
-
-    } else {
-      const preference = {
-        items: [
-          {
-            title: 'Reserva cancha - Los Ciruelos Padel Club',
-            quantity: 1,
-            unit_price: parseFloat(this.price.toString()),
-            currency_id: 'ARS',
-          }
-        ],
-        back_urls: {
-          success: `http://localhost:4200/procesar-pago?date=${this.date}&horario_inicio_ocupado=${this.horario_inicio_ocupado}&court=${this.court}&price=${this.price}&senia=${this.senia}&horario_fin_ocupado=${this.horario_fin_ocupado}`,
-          failure: 'http://localhost:4200/ticket',
-          pending: 'http://localhost:4200/ticket'
-        },
-        auto_return: 'approved',
-      };
-
-      this.mercadopagoService.createPreference(preference).subscribe(response => {
-        this.loadMercadoPago(response.id);
-      }, error => {
-        console.error('Error creando la preferencia:', error);
-      });
+        this.mercadopagoService.createPreference(preferenceData).subscribe(
+          (res) => this.loadMercadoPago(res.preferenceId),
+          (res) => console.log("Error creando la preferencia: ", res)
+        );
     }
-
   }
 
   loadMercadoPago(preferenceId: string) {

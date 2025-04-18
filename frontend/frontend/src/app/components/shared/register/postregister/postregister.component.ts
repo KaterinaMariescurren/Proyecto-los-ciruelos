@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, JugadorDTO } from '../../../../api.service';
 import { AuthService } from '../../../../services/auth.service';
+import { UserService } from '../../../../services/user-service.service';
 
 @Component({
   selector: 'app-postregister',
@@ -28,7 +29,7 @@ export class PostRegisterComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private apiService: ApiService,
     private toastrService: ToastrService,
-    private authService: AuthService
+    private userService: UserService,
   ) {
     this.form = this.formBuilder.group({
       phones: this.formBuilder.array([
@@ -39,13 +40,22 @@ export class PostRegisterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.activatedRoute.queryParams.subscribe(params => {
-      this.email = params['email'] || '';
-      const fullName = params['name'] ? params['name'].trim().split(/\s+/) : [];
-    
-      this.name = fullName.length > 0 ? fullName[0] : ''; // Primer nombre
-      this.lastName = fullName.length > 1 ? fullName.slice(1).join(' ') : '';
-    });
+
+    this.email = this.userService.getUserEmail();
+    this.name = this.userService.getUserName();
+
+    if (!this.email || !this.name) {
+      this.activatedRoute.queryParams.subscribe(params => {
+        console.log('Params recibidos:', params);  // Asegúrate de ver los parámetros aquí
+        this.email = params['email'] || '';
+        const fullName = params['name'] ? params['name'].trim().split(/\s+/) : [];
+      
+        this.name = fullName.length > 0 ? fullName[0] : ''; // Primer nombre
+        this.lastName = fullName.length > 1 ? fullName.slice(1).join(' ') : '';
+      });
+    }
+    console.log("Email:",this.email);
+    console.log("FullName: ", this.name);
   }
 
   // Getter para los teléfonos

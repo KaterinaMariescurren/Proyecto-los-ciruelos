@@ -4,6 +4,7 @@ import { AuthService } from '../../../../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router'; // Importa Router
 import { ToastrService } from 'ngx-toastr';
 import { ApiService } from '../../../../../api.service';
+import { UserService } from '../../../../../services/user-service.service';
 
 @Component({
   selector: 'app-button-providers',
@@ -24,7 +25,8 @@ export class ButtonProviders {
     private router: Router, 
     private api: ApiService,
     private route: ActivatedRoute,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private userService: UserService 
   ) { 
     this.form = this.fb.group({
       name: [''],
@@ -40,13 +42,14 @@ export class ButtonProviders {
         console.log('Inicio de sesión exitoso con Google:', userData);
   
         const email = userData.user.email;
-        const name = userData.user.displayName; // Obtener el nombre
+        const name = userData.user.displayName;
         
-        if (!email) {
-          console.error("El email obtenido de Google es nulo.");
-          this.toastrService.error("No se pudo obtener el email de Google.");
+        if (!email || !name) {
+          this.toastrService.error("No se pudo obtener los datos de Google.");
           return;
         }
+
+        this.userService.setUser(email, name);
   
         // Verificar si el usuario existe en el backend
         this.api.verificarUsuario(email).subscribe((response: any) => {

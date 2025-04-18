@@ -36,6 +36,7 @@ import { CalendarioReservaComponent } from './components/shared/calendario_reser
 import { RegisterEmpleadoComponent } from './components/shared/register-empleado/register-empleado.component';
 import { ConsultarEmpleadoComponent } from './components/shared/consultar-empleado/consultar-empleado.component';
 import { ReservasDuenioComponent } from './components/shared/reservas-duenio/reservas-duenio.component';
+import { postRegisterGuard } from './auth/postregister.guard';
 
 
 const routes: Routes = [
@@ -45,7 +46,6 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [noAuthGuard] },
   { path: 'cambiar-contrasenia', component: CambiarContraseniaComponent, canActivate: [noAuthGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [noAuthGuard] },
-  { path: 'postregister', component: PostRegisterComponent, canActivate: [authGuard] },
   { path: 'reestablecer-contrasenia', component: ReestablecerContraseniaComponent, canActivate: [noAuthGuard] },
   { path: 'verifyEmail', component: VerificarCorreoComponent, canActivate: [noAuthGuard] },
   { path: 'profesores', component: ProfesoresComponent }, 
@@ -53,13 +53,14 @@ const routes: Routes = [
   { path: 'calendario', component: ReservasDuenioComponent},
 
 //--------------------- Rutas protegida (con autenticacion) ------------------------------------------------
-  { path: 'mercadopago', component: MercadopagoComponent, canActivate: [authGuard] },
-  { path: 'ticket', component: TicketComponent, canActivate: [authGuard] },
-  { path: 'reserva', component: ReservaComponent, canActivate: [authGuard] },
-  { path: 'procesar-pago', component: ProcesarPagoComponent, canActivate: [authGuard] },
-  { path: 'mis-reservas', component: MisReservasComponent, canActivate: [authGuard]  },
-  { path: 'perfil', component: PerfilComponent, canActivate: [authGuard]  }, 
-  { path: 'register-empleado', component: RegisterEmpleadoComponent, canActivate: [authGuard] },
+  { path: 'mercadopago', component: MercadopagoComponent, canActivate: [authGuard, postRegisterGuard] },
+  { path: 'postregister', component: PostRegisterComponent, canActivate: [authGuard] },
+  { path: 'ticket', component: TicketComponent, canActivate: [authGuard, postRegisterGuard] },
+  { path: 'reserva', component: ReservaComponent, canActivate: [authGuard, postRegisterGuard] },
+  { path: 'procesar-pago', component: ProcesarPagoComponent, canActivate: [authGuard, postRegisterGuard] },
+  { path: 'mis-reservas', component: MisReservasComponent, canActivate: [authGuard, postRegisterGuard]  },
+  { path: 'perfil', component: PerfilComponent, canActivate: [authGuard, postRegisterGuard]  }, 
+  { path: 'register-empleado', component: RegisterEmpleadoComponent, canActivate: [authGuard, postRegisterGuard] },
 
 //--------------------- Rutas protegida (SOLO administrador) ------------------------------------------------
   { path: 'consultar_reservas', component: ConsultarReservasComponent },

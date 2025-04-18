@@ -10,6 +10,7 @@ services:
       DB_URL: jdbc:mysql://los_ciruelos:3306/los_ciruelos?createDatabaseIfNotExist=true&serverTimezone=UTC
       DB_USERNAME: root
       DB_PASSWORD: 1234
+      MERCADO_PAGO_ACCESS_TOKEN: APP_USR-5356347604739108-020916-65561a50ec097c174f39c33d1e554d9b-1954862914
       FIREBASE_CREDENTIALS_PATH: /app/firebase_credentials.json  # Ruta dentro del contenedor
     restart: always
     depends_on:

@@ -1,23 +1,38 @@
+// src/app/services/mercadopago.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { from, Observable, switchMap, throwError } from 'rxjs';
+import { ApiService } from '../api.service';
+import { AuthService } from './auth.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class MercadopagoService {
-  // Usa tu token de acceso en la URL de la API
-  private accessToken = 'APP_USR-5356347604739108-020916-65561a50ec097c174f39c33d1e554d9b-1954862914';
-  private baseUrl = 'https://api.mercadopago.com/checkout/preferences';
+  constructor(private http: HttpClient, private api: ApiService, private authService: AuthService) {}
 
-  constructor(private http: HttpClient) { }
-
-  createPreference(preferenceData: any): Observable<any> {
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.accessToken}`,
-      'Content-Type': 'application/json'
-    });
-
-    return this.http.post<any>(this.baseUrl, preferenceData, { headers });
+  createPreference(data: {
+    title: string;
+    price: number;
+    successUrl: string;
+    failureUrl: string;
+    pendingUrl: string;
+  }): Observable<{ preferenceId: string }> {
+    return from(this.authService.getIdToken()).pipe(
+      switchMap(token => {
+        if (!token) {
+          console.error("❌ No se encontró un token válido.");
+          return throwError(() => new Error("Token no disponible"));
+        }
+  
+        const url = `http://localhost:8080/private/mercadopago/preference`;
+  
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        });
+  
+        return this.http.post<{ preferenceId: string }>(url, data, { headers });
+      })
+    );
   }
+  
 }

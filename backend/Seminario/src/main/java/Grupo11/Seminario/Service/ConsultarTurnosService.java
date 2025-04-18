@@ -1,7 +1,6 @@
 package Grupo11.Seminario.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -43,11 +42,17 @@ public class ConsultarTurnosService {
         // Iteramos por cada cancha
         for (Cancha cancha: canchas){
             // Obtenemos los turnos por cada cancha, ordenados por fecha y por horario de inicio
-            List<Turno> turnos_por_cancha = i_turno_repository.findByCanchaAndFechaGreaterThanEqualOrderByFechaAscHorarioInicioAsc(cancha, fechaActual);
+            List<Turno> turnos_por_cancha = i_turno_repository.
+                findTurnosFuturosPorCancha(cancha, fechaActual, horaActual);
             
             // Revisar los espacios entre turnos ocupados
             for (int i = 0; i < turnos_por_cancha.size(); i++) {
                 Turno turno_actual = turnos_por_cancha.get(i);
+
+                // Verificamos si el turno ya pasó (en la misma fecha y hora menor)
+                if (turno_actual.getFecha().isEqual(fechaActual) && turno_actual.getHorarioInicio().isBefore(horaActual)) {
+                    continue; // salteamos este turno
+                }
 
                 // Dia de la semana del turno
                 String dia_de_semana = this.dia_espaniol(turno_actual.getFecha());

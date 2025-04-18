@@ -70,9 +70,7 @@ export class ProcesarPagoComponent {
     }else{
       // Determinamos el valor de 'senia' basado en el valor de 'this.senia'
       const seniaValue = this.senia === "seña" ? true : false;
-      this.senia === "total" ? false : 
-      (() => { throw new Error('Valor de senia no válido'); })();
-
+      
       const reservaDTO: ReservaDTO = {
         cantidad_pelotas: 0,
         cantidad_paletas: 0,

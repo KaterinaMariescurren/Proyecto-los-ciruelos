@@ -46,6 +46,10 @@ export class AuthService {
     );
   }
 
+  getCurrentUser$(): Observable<User | null> {
+    return this.authState$;
+  }  
+
   // Método para hacer logout
   logout(): Promise<void> {
     return signOut(this.auth)
