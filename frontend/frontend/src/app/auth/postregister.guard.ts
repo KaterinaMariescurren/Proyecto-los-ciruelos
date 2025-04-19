@@ -27,7 +27,7 @@ export const postRegisterGuard: CanActivateFn = (route, state) => {
             return true; // Está en postregister, se permite
           } else {
             // Si no está registrado y quiere navegar a otra página => redirigir
-            toastrService.info('Debe completar sus datos para seguir.', 'Completar Datos');
+            toastrService.info('Debes completar tus datos antes de continuar.', 'Completar Datos');
             return router.parseUrl('/postregister');
           }
         }),

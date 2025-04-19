@@ -11,7 +11,8 @@ services:
       DB_USERNAME: root
       DB_PASSWORD: 1234
       MERCADO_PAGO_ACCESS_TOKEN: APP_USR-5356347604739108-020916-65561a50ec097c174f39c33d1e554d9b-1954862914
-      FIREBASE_CREDENTIALS_PATH: /app/firebase_credentials.json  # Ruta dentro del contenedor
+      FIREBASE_CREDENTIALS_PATH: /app/firebase_credentials.json
+      TZ: America/Argentina/Buenos_Aires
     restart: always
     depends_on:
       los_ciruelos:

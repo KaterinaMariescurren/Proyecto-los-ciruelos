@@ -43,6 +43,7 @@ export class CalendarioReservaComponent implements OnInit {
   reservations: Reserva[] = [];
   isLoggedIn$!: Observable<boolean>;
   isSocio: boolean = false;
+  isRegistrado: boolean = false;
 
   showOptionsMenu = false;
   optionsMenuPosition = { top: 0, left: 0 };
@@ -81,22 +82,32 @@ export class CalendarioReservaComponent implements OnInit {
     this.isLoggedIn$.subscribe(isLogged => {
       if (isLogged) {
         this.api.getPerfil().subscribe((perfil) => {
-          console.log(perfil.socio);
-          this.isSocio = perfil?.socio ?? false;
+          if (perfil?.socio !== undefined) {
+            this.isSocio = perfil.socio;
+            this.isRegistrado = true;
+          } else {
+            this.isRegistrado = false;
+          }
         });
       }
     });
   }
 
   onButtonClick() {
-    if (this.isLoggedIn$) {
-      console.log(this.selectedCourt?.id);
-      console.log(this.selectedDate);
-      console.log(this.selectedSlot);
+    this.authService.isAuthenticated$().subscribe((isLogged) => {
+      if (!isLogged) {
+        this.router.navigate(['/login']);
+        return;
+      }
+      if (!this.isRegistrado) {
+        this.toastrService.info('Debes completar tus datos antes de continuar.', 'Completar Datos');
+        this.router.navigate(['/postregister']);
+        return;
+      }
+
       const selectedDate = this.selectedDate; // Fecha seleccionada en el calendario
       const startTime = this.selectedSlot ?? ""; // El horario de inicio es el slot donde el usuario hace click
       const endTime = this.getEndTime(startTime); // El horario de fin será 90 minutos después
-      console.log(endTime);
 
       const turnoDTO: TurnoDTO = {
         id_cancha: this.selectedCourt?.id ?? 0, // Reemplaza con el ID de la cancha
@@ -109,7 +120,6 @@ export class CalendarioReservaComponent implements OnInit {
       this.api.bloquearTurno(turnoDTO).subscribe({
         next: (response) => {
           // Si la respuesta es exitosa, redirige a la página de ticket
-          console.log('Respuesta de la API:', response); // Verifica que la respuesta sea correcta
           if (response?.message === "Se bloqueo el turno") {
 
             this.router.navigate(['/reserva'], {
@@ -128,9 +138,7 @@ export class CalendarioReservaComponent implements OnInit {
           this.toastrService.error('Hubo un error al intentar bloquear el turno.', 'Error');
         }
       });
-    } else {
-      this.router.navigate(['/login']);
-    }
+    })
   }  
 
   cargarRerservaciones() {
@@ -142,7 +150,6 @@ export class CalendarioReservaComponent implements OnInit {
           horario_fin_ocupado: turno.horario_fin_ocupado,
           fecha: turno.fecha
         }));
-        console.log('Reservas cargadas:', this.reservations);
       },
       (error) => {
         console.error('Error al cargar los turnos', error);
