@@ -27,11 +27,7 @@ export class CalendarioReservaComponent implements OnInit {
     '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00'
   ];
 
-  timeSlotsDisplay = [
-    '8', '8:30', '9', '9:30', '10', '10:30', '11', '11:30', '12', '12:30', 
-    '13', '13:30', '14', '14:30', '15', '15:30', '16', '16:30', '17', '17:30', 
-    '18', '18:30', '19', '19:30', '20', '20:30', '21', '21:30', '22'
-  ];
+  timeSlotsDisplay: string[] = [];
 
   courts: Court[] = [
     { id: 1, name: 'Cancha 1' },
@@ -67,6 +63,8 @@ export class CalendarioReservaComponent implements OnInit {
 
   ngOnInit() {
     this.cargarRerservaciones();
+    this.timeSlotsDisplay = this.getFormattedTimeSlots();
+
     // Primero revisamos si ya tenemos la configuración almacenada
     this.configuracion = this.configuracionService.getStoredConfiguracion();
 
@@ -141,6 +139,50 @@ export class CalendarioReservaComponent implements OnInit {
     })
   }  
 
+  getTimeSlotsParaDiaSeleccionado(): string[] {
+    if (!this.configuracion || !this.selectedDate) return [];
+  
+    // Obtener el día de la semana formateado correctamente
+    const diaSemana = this.getDiaDeLaSemana(this.selectedDate); // El día formateado como "Lunes", "Martes", etc.
+    
+    // Buscar el día de apertura en la configuración que coincida con el día de la semana
+    const diaApertura = this.configuracion.dias_apertura.find(d => d.dia === diaSemana);
+  
+    if (!diaApertura) {
+      console.log(`No hay horarios disponibles para ${diaSemana}`);  // Debugging
+      return [];  // No hay horarios disponibles para este día
+    }
+  
+    // Obtener el rango de horas disponibles para este día
+    const startMinutes = this.timeToMinutes(diaApertura.horario_inicio);
+    const endMinutes = this.timeToMinutes(diaApertura.horario_fin);
+  
+    // Filtrar los horarios disponibles que caen dentro del rango de apertura
+    return this.timeSlots.filter(time => {
+      const minutes = this.timeToMinutes(time);
+      return minutes >= startMinutes && minutes <= endMinutes;
+    });
+  }  
+
+  getDiaDeLaSemana(dateString: string): string {
+    const dias = [ 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  
+    const date = new Date(dateString);
+  
+    const dia = date.getDay();  // 0 para domingo, 1 para lunes, etc.
+  
+    return dias[dia];
+  }
+  
+  formatSlotDisplay(slot: string): string {
+    // Verifica si el slot termina con ":00"
+    const [hour, minute] = slot.split(':');
+    if (minute === '00') {
+      return hour; // Solo muestra la hora sin minutos
+    }
+    return slot; // Si no termina en ":00", devuelve la hora y los minutos
+  }  
+
   cargarRerservaciones() {
     this.api.getTurnos().subscribe(
       (turnos) => {
@@ -157,7 +199,6 @@ export class CalendarioReservaComponent implements OnInit {
     );
   }
   
-
   getMinDate(): string {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -165,6 +206,19 @@ export class CalendarioReservaComponent implements OnInit {
     const dd = String(today.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
   }
+
+  getFormattedTimeSlots() {
+    return this.timeSlots.map((slot) => {
+      const [hour, minute] = slot.split(':').map(Number);
+      if (minute === 0) {
+        // Si es una hora exacta, solo mostrar la hora
+        return `${hour}`;
+      } else {
+        // Si tiene minutos, mostrar la hora y los minutos
+        return `${hour}:${minute}`;
+      }
+    });
+  }  
 
   onDateChange(event: Event): void {
     const input = event.target as HTMLInputElement;

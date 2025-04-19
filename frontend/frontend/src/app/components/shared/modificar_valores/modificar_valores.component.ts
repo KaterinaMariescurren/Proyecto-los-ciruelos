@@ -16,7 +16,7 @@ export class ModificarValoresComponent implements OnInit {
   duenioEmail: string = '';
   diasApertura: any[] = [];
   originalValues: any = {};
-  
+  horasDisponibles: string[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -53,6 +53,8 @@ export class ModificarValoresComponent implements OnInit {
     });
 
     this.obtenerConfiguracion();
+    this.generarHorarios();
+
   }
 
   obtenerConfiguracion(): void {
@@ -92,8 +94,23 @@ export class ModificarValoresComponent implements OnInit {
   }
   
   actualizarHorario(index: number, tipo: 'horario_inicio' | 'horario_fin', nuevoValor: string) {
-    this.diasApertura[index][tipo] = nuevoValor;
+    const [hora, minutos] = nuevoValor.split(":").map(num => parseInt(num, 10));
+    const minutosRedondeados = minutos < 30 ? 0 : 30;
+    const nuevoHorario = `${hora.toString().padStart(2, '0')}:${minutosRedondeados.toString().padStart(2, '0')}`;
+    this.diasApertura[index][tipo] = nuevoHorario;
     this.formModificado = true;
+  }
+  
+  generarHorarios() {
+    const horas = [];
+    for (let h = 0; h < 24; h++) {
+      for (let m of [0, 30]) {
+        const horaStr = h.toString().padStart(2, '0');
+        const minStr = m.toString().padStart(2, '0');
+        horas.push(`${horaStr}:${minStr}`);
+      }
+    }
+    this.horasDisponibles = horas;
   }
 
   guardarConfiguracion(): void {

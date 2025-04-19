@@ -100,15 +100,27 @@
             </td>
             <td>
               <mat-form-field appearance="outline">
-                <input matInput type="time" [disabled]="!diasApertura[i].abierto" [value]="diasApertura[i].horario_inicio"
-                  (change)="actualizarHorario(i, 'horario_inicio', $any($event.target).value)">
+                <mat-select
+                  [disabled]="!diasApertura[i].abierto"
+                  [value]="diasApertura[i].horario_inicio.substring(0,5)"
+                  (selectionChange)="actualizarHorario(i, 'horario_inicio', $event.value)">
+                  <mat-option *ngFor="let hora of horasDisponibles" [value]="hora">
+                    {{ hora }}
+                  </mat-option>
+                </mat-select>
               </mat-form-field>
             </td>
             
             <td>
               <mat-form-field appearance="outline">
-                <input matInput type="time" [disabled]="!diasApertura[i].abierto" [value]="diasApertura[i].horario_fin"
-                  (change)="actualizarHorario(i, 'horario_fin', $any($event.target).value)">
+                  <mat-select
+                  [disabled]="!diasApertura[i].abierto"
+                  [value]="diasApertura[i].horario_fin.substring(0,5)"
+                  (selectionChange)="actualizarHorario(i, 'horario_fin', $event.value)">
+                  <mat-option *ngFor="let hora of horasDisponibles" [value]="hora">
+                    {{ hora }}
+                  </mat-option>
+                </mat-select>
               </mat-form-field>
             </td>
           </tr>
