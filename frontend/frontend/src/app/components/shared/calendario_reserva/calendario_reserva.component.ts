@@ -17,17 +17,20 @@ export interface Court {
   styleUrl: './calendario_reserva.component.css'
 })
 export class CalendarioReservaComponent implements OnInit {
-  selectedDate: string = new Date().toISOString().split('T')[0];
+  selectedDate: string = '';
   minDate: string = this.getMinDate();
   currentHour: number = new Date().getHours();
 
+  // Horarios genericos
   timeSlots = [
-    '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30',
-    '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
-    '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00'
+    '00:00','00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30',
+    '05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30',
+    '10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30', 
+    '15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30', 
+    '20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'
   ];
 
-  timeSlotsDisplay: string[] = [];
+  timeSlotsDelDia: string[] = [];
 
   courts: Court[] = [
     { id: 1, name: 'Cancha 1' },
@@ -62,8 +65,9 @@ export class CalendarioReservaComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.selectedDate = this.getCurrentDate();
+    this.actualizarTimeSlotsDelDia(); 
     this.cargarRerservaciones();
-    this.timeSlotsDisplay = this.getFormattedTimeSlots();
 
     // Primero revisamos si ya tenemos la configuración almacenada
     this.configuracion = this.configuracionService.getStoredConfiguracion();
@@ -74,7 +78,10 @@ export class CalendarioReservaComponent implements OnInit {
         // Guardamos la configuración para poder usarla más tarde
         this.configuracionService.setConfiguracion(config);
         this.configuracion = config;
+        this.actualizarTimeSlotsDelDia();
       });
+    }else{
+      this.actualizarTimeSlotsDelDia();
     }
     this.isLoggedIn$ = this.authService.isAuthenticated$();
     this.isLoggedIn$.subscribe(isLogged => {
@@ -90,6 +97,79 @@ export class CalendarioReservaComponent implements OnInit {
       }
     });
   }
+
+  cargarRerservaciones() {
+    this.api.getTurnos().subscribe(
+      (turnos) => {
+        this.reservations = turnos.filter(turno => turno.fecha === this.selectedDate).map(turno => ({
+          id_cancha: turno.id_cancha,
+          horario_inicio_ocupado: turno.horario_inicio_ocupado,
+          horario_fin_ocupado: turno.horario_fin_ocupado,
+          fecha: turno.fecha
+        }));
+      },
+      (error) => {
+        console.error('Error al cargar los turnos', error);
+      }
+    );
+  }
+
+  obtenerHorariosDisponibles(): string[] {
+    if (!this.configuracion || !this.selectedDate) return [];
+  
+    // Obtener el día de la semana formateado correctamente
+    const diaSemana = this.getDiaDeLaSemana(this.selectedDate); // El día formateado como "Lunes", "Martes", etc.
+    
+    // Buscar el día de apertura en la configuración que coincida con el día de la semana
+    const diaApertura = this.configuracion.dias_apertura.find(d => d.dia === diaSemana);
+  
+    if (!diaApertura) {
+      console.log(`No hay horarios disponibles para ${diaSemana}`);  // Debugging
+      return [];  // No hay horarios disponibles para este día
+    }
+  
+    // Obtener el rango de horas disponibles para este día
+    const startMinutes = this.timeToMinutes(diaApertura.horario_inicio);
+    const endMinutes = this.timeToMinutes(diaApertura.horario_fin);
+  
+    // Filtrar los horarios disponibles que caen dentro del rango de apertura
+    return this.timeSlots.filter(time => {
+      const minutes = this.timeToMinutes(time);
+      return minutes >= startMinutes && minutes <= endMinutes;
+    });
+  }  
+
+  getCurrentDate(): string {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  }
+
+  actualizarTimeSlotsDelDia(): void {
+    if (!this.configuracion || !this.selectedDate) {
+      this.timeSlotsDelDia = [];
+      return;
+    }
+  
+    const diaSemana = this.getDiaDeLaSemana(this.selectedDate); // ej: "Lunes"
+    console.log("Dia:" + diaSemana);
+    const diaApertura = this.configuracion.dias_apertura.find(d => d.dia === diaSemana);
+  
+    if (!diaApertura) {
+      this.timeSlotsDelDia = [];
+      return;
+    }
+    
+    console.log(diaApertura.horario_inicio)
+    console.log(diaApertura.horario_fin)
+    const startMinutes = this.timeToMinutes(diaApertura.horario_inicio);
+    const endMinutes = this.timeToMinutes(diaApertura.horario_fin);
+  
+    this.timeSlotsDelDia = this.timeSlots.filter(time => {
+      const minutes = this.timeToMinutes(time);
+      return minutes >= startMinutes && minutes <= endMinutes;
+    });
+    console.log(this.timeSlotsDelDia)
+  }  
 
   onButtonClick() {
     this.authService.isAuthenticated$().subscribe((isLogged) => {
@@ -139,31 +219,6 @@ export class CalendarioReservaComponent implements OnInit {
     })
   }  
 
-  getTimeSlotsParaDiaSeleccionado(): string[] {
-    if (!this.configuracion || !this.selectedDate) return [];
-  
-    // Obtener el día de la semana formateado correctamente
-    const diaSemana = this.getDiaDeLaSemana(this.selectedDate); // El día formateado como "Lunes", "Martes", etc.
-    
-    // Buscar el día de apertura en la configuración que coincida con el día de la semana
-    const diaApertura = this.configuracion.dias_apertura.find(d => d.dia === diaSemana);
-  
-    if (!diaApertura) {
-      console.log(`No hay horarios disponibles para ${diaSemana}`);  // Debugging
-      return [];  // No hay horarios disponibles para este día
-    }
-  
-    // Obtener el rango de horas disponibles para este día
-    const startMinutes = this.timeToMinutes(diaApertura.horario_inicio);
-    const endMinutes = this.timeToMinutes(diaApertura.horario_fin);
-  
-    // Filtrar los horarios disponibles que caen dentro del rango de apertura
-    return this.timeSlots.filter(time => {
-      const minutes = this.timeToMinutes(time);
-      return minutes >= startMinutes && minutes <= endMinutes;
-    });
-  }  
-
   getDiaDeLaSemana(dateString: string): string {
     const dias = [ 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   
@@ -182,22 +237,6 @@ export class CalendarioReservaComponent implements OnInit {
     }
     return slot; // Si no termina en ":00", devuelve la hora y los minutos
   }  
-
-  cargarRerservaciones() {
-    this.api.getTurnos().subscribe(
-      (turnos) => {
-        this.reservations = turnos.filter(turno => turno.fecha === this.selectedDate).map(turno => ({
-          id_cancha: turno.id_cancha,
-          horario_inicio_ocupado: turno.horario_inicio_ocupado,
-          horario_fin_ocupado: turno.horario_fin_ocupado,
-          fecha: turno.fecha
-        }));
-      },
-      (error) => {
-        console.error('Error al cargar los turnos', error);
-      }
-    );
-  }
   
   getMinDate(): string {
     const today = new Date();
@@ -223,6 +262,7 @@ export class CalendarioReservaComponent implements OnInit {
   onDateChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.selectedDate = input.value;
+    this.actualizarTimeSlotsDelDia();
     this.cargarRerservaciones(); // Volver a cargar las reservas del backend
     this.clearSelectedCells();
     this.hideOptionsMenu();
@@ -239,18 +279,14 @@ export class CalendarioReservaComponent implements OnInit {
   }
   
   showTimeOptions(court: Court, slot: string, event: MouseEvent) {
+    console.log("Horario disponible:" + this.timeSlotsDelDia);
     this.highlightedCells = []; 
     this.showOptionsMenu=false;
   
     this.selectedCourt = court;
     this.selectedSlot = slot; 
-
-    // Verificar si la celda está ocupada (reservada)
-    if (this.isReserved(court.id, slot)) {
-      return; 
-    }
   
-    const slotIndex = this.timeSlots.indexOf(slot);
+    const slotIndex = this.timeSlotsDelDia.indexOf(slot);
     
     if (slotIndex !== -1) {
       // Verificar si la celda tiene conflicto de tiempo
@@ -261,7 +297,7 @@ export class CalendarioReservaComponent implements OnInit {
   
       // Ahora calculamos las celdas hasta la hora de finalización
       const endTime = this.getEndTime(slot); // Obtener el tiempo de finalización
-      let endSlotIndex = this.timeSlots.indexOf(endTime);
+      let endSlotIndex = this.timeSlotsDelDia.indexOf(endTime);
   
       if (endSlotIndex !== -1) {
         // Resaltar todas las celdas entre start y end
@@ -271,13 +307,13 @@ export class CalendarioReservaComponent implements OnInit {
 
           let cantidad_celdas_sin_rojo = 0;
           for (let i = slotIndex ; i <= endSlotIndex; i++) {
-            if (this.isReserved(court.id, this.timeSlots[i])!=='red') {
+            if (this.isReserved(court.id, this.timeSlotsDelDia[i])!=='red') {
               cantidad_celdas_sin_rojo=cantidad_celdas_sin_rojo+1;
               if((cantidad_celdas_sin_rojo==4)){
-                this.highlightedCells.push({ courtId: court.id, slot: this.timeSlots[i] });
-                this.highlightedCells.push({ courtId: court.id, slot: this.timeSlots[i-1] });
-                this.highlightedCells.push({ courtId: court.id, slot: this.timeSlots[i-2] });
-                this.highlightedCells.push({ courtId: court.id, slot: this.timeSlots[i-3] });
+                this.highlightedCells.push({ courtId: court.id, slot: this.timeSlotsDelDia[i] });
+                this.highlightedCells.push({ courtId: court.id, slot: this.timeSlotsDelDia[i-1] });
+                this.highlightedCells.push({ courtId: court.id, slot: this.timeSlotsDelDia[i-2] });
+                this.highlightedCells.push({ courtId: court.id, slot: this.timeSlotsDelDia[i-3] });
                 this.showOptionsMenu = true;
               }else{
                 this.showOptionsMenu = false;

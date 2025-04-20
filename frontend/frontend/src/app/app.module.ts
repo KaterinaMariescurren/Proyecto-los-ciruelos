@@ -60,8 +60,6 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { environment } from '../environments/environment';
 import { ReservasDuenioComponent } from './components/shared/reservas-duenio/reservas-duenio.component';
 
-
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -90,7 +88,7 @@ import { ReservasDuenioComponent } from './components/shared/reservas-duenio/res
     ModificarValoresComponent,
     RegisterEmpleadoComponent,
     ConsultarEmpleadoComponent,
-    ReservasDuenioComponent
+    ReservasDuenioComponent,
 
   ],
   imports: [

@@ -15,6 +15,13 @@
   flex-wrap: wrap;
 }
 
+/* Celdas reservadas parcialmente (media celda) */
+.reserved-half {
+  background: linear-gradient(to right, rgba(255, 0, 0, 0.6) 50%, transparent 50%);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* Estilizar la tabla */
 .calendar-table {
   border-collapse: collapse;
