@@ -94,7 +94,7 @@ public class ReservaController {
                                 turno.setCancha(cancha);
                                 turno.setFecha(reservaDTO.getFecha());
                                 turno.setHorarioInicio(reservaDTO.getHorario_inicio());
-                                turno.setHorario_fin(reservaDTO.getHorario_fin());
+                                turno.setHorarioFin(reservaDTO.getHorario_fin());
                                 turno.setEstado(EstadoTurno.Reservado);
         
                                 reserva.setTurno(turno);
@@ -127,7 +127,7 @@ public class ReservaController {
                     turno.setCancha(cancha);
                     turno.setFecha(reservaDTO.getFecha());
                     turno.setHorarioInicio(reservaDTO.getHorario_inicio());
-                    turno.setHorario_fin(reservaDTO.getHorario_fin());
+                    turno.setHorarioFin(reservaDTO.getHorario_fin());
                     turno.setEstado(EstadoTurno.Reservado);
 
                     reserva.setTurno(turno);

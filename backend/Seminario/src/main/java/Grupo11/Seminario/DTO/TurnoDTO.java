@@ -9,16 +9,15 @@ import lombok.Data;
 public class TurnoDTO {
     
     private Integer id_cancha;
-    private LocalDate fecha;
-    private LocalTime horario_inicio_ocupado;
-    private LocalTime horario_fin_ocupado;
+    private LocalDate fechaDeseada;
+    private LocalTime horario_deseado;
+    private Integer duracion;
 
     public TurnoDTO(
-        Integer id_cancha, LocalDate fecha, 
-        LocalTime horario_inicio_ocupado, LocalTime horario_fin_ocupado) {
+        Integer id_cancha, LocalDate fechaDeseada, LocalTime horario_deseado, Integer duracion) {
         this.id_cancha = id_cancha;
-        this.fecha = fecha;
-        this.horario_inicio_ocupado = horario_inicio_ocupado;
-        this.horario_fin_ocupado = horario_fin_ocupado;
+        this.fechaDeseada = fechaDeseada;
+        this.horario_deseado = horario_deseado;
+        this.duracion = duracion;
     }
 }

@@ -11,6 +11,7 @@ import { roleGuard } from './auth/role.guard';
 import { HomeComponent } from './components/home/home.component';
 import { BeneficiosSociosComponent } from './components/beneficios-socios/beneficios-socios.component';
 import { ProfesoresComponent } from './components/shared/profesores/profesores.component';
+import { SeleccionarTurnoComponent } from './components/shared/seleccionar-turno/seleccionar-turno.component';
 
 // Componentes de autenticación
 import { LoginComponent } from './components/shared/login/login.component';
@@ -51,6 +52,7 @@ const routes: Routes = [
   { path: 'profesores', component: ProfesoresComponent }, 
   { path: 'beneficios', component: BeneficiosSociosComponent },
   { path: 'calendario', component: ReservasDuenioComponent},
+  { path: 'seleccionar-turno', component: SeleccionarTurnoComponent },
 
 //--------------------- Rutas protegida (con autenticacion) ------------------------------------------------
   { path: 'mercadopago', component: MercadopagoComponent, canActivate: [authGuard, postRegisterGuard] },

@@ -37,7 +37,7 @@ public class Turno {
     private LocalTime horarioInicio;
 
     @Column(nullable = false, name = "horario_fin")
-    private LocalTime horario_fin;
+    private LocalTime horarioFin;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "estado")

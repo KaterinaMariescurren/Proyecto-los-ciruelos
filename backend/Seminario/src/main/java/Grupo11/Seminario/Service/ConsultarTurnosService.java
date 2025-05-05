@@ -1,11 +1,11 @@
 package Grupo11.Seminario.Service;
 
 import java.util.List;
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDate;
+import java.util.Map;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,114 +32,81 @@ public class ConsultarTurnosService {
     @Autowired
     ConfiguracionGeneralService configuracion_general_service;
 
-    public List<TurnoDTO> obtener_turnos_ocupados(){
-        List<TurnoDTO> turnosDTO = new ArrayList<>();
+    public List<Cancha> obtener_turnos_disponibles(TurnoDTO turnoDTO) {
+        List<Cancha> canchasDisponibles = new ArrayList<>();
         List<Cancha> canchas = (List<Cancha>) i_cancha_repository.findAll();
-        ConfiguracionGeneral configuracion_general = configuracion_general_service.get_configuracion_general();
-        LocalDate fechaActual = LocalDate.now();
-        LocalTime horaActual = LocalTime.now().withSecond(0).withNano(0);
+        ConfiguracionGeneral configuracionGeneral = configuracion_general_service.get_configuracion_general();
 
-        System.out.println("Fecha actual: " + fechaActual);
-        System.out.println("Hora actual: " + horaActual);
+        // Mapa para traducir los días en inglés a español
+        Map<String, String> diasEnEspañol = new HashMap<>();
+        diasEnEspañol.put("MONDAY", "lunes");
+        diasEnEspañol.put("TUESDAY", "martes");
+        diasEnEspañol.put("WEDNESDAY", "miércoles");
+        diasEnEspañol.put("THURSDAY", "jueves");
+        diasEnEspañol.put("FRIDAY", "viernes");
+        diasEnEspañol.put("SATURDAY", "sábado");
+        diasEnEspañol.put("SUNDAY", "domingo");
 
-        // Iteramos por cada cancha
-        for (Cancha cancha: canchas){
-            // Obtenemos los turnos por cada cancha, ordenados por fecha y por horario de inicio
-            System.out.println("Buscando turnos a partir de " + fechaActual + " " + horaActual);
-            List<Turno> turnos_por_cancha = i_turno_repository.
-            findTurnosFuturosPorCanchaJPQL(cancha.getId(), fechaActual, horaActual);
-            System.out.println("Lista de turnos: " + turnos_por_cancha);
-            // Revisar los espacios entre turnos ocupados
-            for (int i = 0; i < turnos_por_cancha.size(); i++) {
-                Turno turno_actual = turnos_por_cancha.get(i);
+        // Obtener el día de la semana en inglés de la fecha deseada
+        String diaEnIngles = turnoDTO.getFechaDeseada().getDayOfWeek().name();
+        String diaEnEspañol = diasEnEspañol.get(diaEnIngles);
 
-                // Verificamos si el turno ya pasó (en la misma fecha y hora menor)
-                if (turno_actual.getFecha().isEqual(fechaActual) && turno_actual.getHorarioInicio().isBefore(horaActual)) {
-                    continue; // salteamos este turno
+        // Obtener la configuración del día para el día específico (en español)
+        DiaApertura diaConfig = configuracionGeneral.getDias_apertura().stream()
+            .filter(d -> d.getDia().equalsIgnoreCase(diaEnEspañol))
+            .findFirst()
+            .orElse(null);
+
+        if (diaConfig == null) {
+            return canchasDisponibles; // Día cerrado, no hay disponibilidad
+        }
+
+        // Horarios de apertura y cierre del establecimiento
+        LocalTime apertura = diaConfig.getHorario_inicio();
+        LocalTime cierre = diaConfig.getHorario_fin();
+
+        // Obtener el horario deseado del turno
+        LocalTime horaInicioDeseada = turnoDTO.getHorario_deseado();
+        LocalTime horaFinDeseada = horaInicioDeseada.plusMinutes(turnoDTO.getDuracion());
+
+        // Verificar si el turno deseado entra dentro del horario de apertura y cierre
+        if (horaInicioDeseada.isBefore(apertura) || horaFinDeseada.isAfter(cierre)) {
+            return canchasDisponibles; // El turno no está dentro del horario de apertura/cierre
+        }
+
+        // Comprobar cada cancha para ver si el turno se puede reservar
+        for (Cancha cancha : canchas) {
+            List<Turno> turnosPorCancha = i_turno_repository
+                .findTurnosFuturosPorCanchaJPQL(cancha.getId(), turnoDTO.getFechaDeseada(), apertura);
+
+            boolean puedeReservar = true;
+
+            if (turnosPorCancha.isEmpty()) {
+                // Si no hay turnos existentes, se puede reservar si está dentro del horario permitido
+                if (horaInicioDeseada.compareTo(apertura) >= 0 && horaFinDeseada.compareTo(cierre) <= 0) {
+                    canchasDisponibles.add(cancha);
                 }
+                continue;
+            }
 
-                // Dia de la semana del turno
-                String dia_de_semana = this.dia_espaniol(turno_actual.getFecha());
+            // Verificar si hay superposición con los turnos existentes
+            for (Turno turno : turnosPorCancha) {
+                LocalTime inicioExistente = turno.getHorarioInicio();
+                LocalTime finExistente = turno.getHorarioFin();
 
-                DiaApertura dia_apertura = i_dia_apertura_repository.findByDia(dia_de_semana);
-
-                // Difencia en minutos entre el turno y el horario de apertura
-                long minutos_entre_apertura = Duration.between(dia_apertura.getHorario_inicio(), turno_actual.getHorarioInicio()).toMinutes();
-
-                // Ver si hay un espacio estre el turno y el horario de apertura
-                if ( minutos_entre_apertura>0 & minutos_entre_apertura<configuracion_general.getDuracion_minima_turno()) {
-                    turnosDTO.add(new TurnoDTO(
-                        cancha.getId(),
-                        turno_actual.getFecha(),
-                        dia_apertura.getHorario_inicio(),
-                        turno_actual.getHorarioInicio()
-                    ));
-                }
-
-                turnosDTO.add(new TurnoDTO(
-                cancha.getId(),
-                turno_actual.getFecha(),
-                turno_actual.getHorarioInicio(),
-                turno_actual.getHorario_fin()
-                ));
-
-                // Ver si hay un espacio entre este turno y el siguiente
-                if (i < turnos_por_cancha.size() - 1) {
-                    Turno siguiente_turno = turnos_por_cancha.get(i+1);
-                    LocalTime fin_turno_actual = turno_actual.getHorario_fin();
-                    LocalTime inicio_siguiente_turno = siguiente_turno.getHorarioInicio();
-
-                    // Diferencia en minutos entre los dos turnos
-                    long minutos_entre_turnos = Duration.between(fin_turno_actual, inicio_siguiente_turno).toMinutes();
-
-                    if ( minutos_entre_turnos>0 & minutos_entre_turnos<configuracion_general.getDuracion_minima_turno()) {
-                        turnosDTO.add(new TurnoDTO(
-                            cancha.getId(),
-                            turno_actual.getFecha(),
-                            fin_turno_actual,
-                            inicio_siguiente_turno
-                        ));
-                    }
-                }
-
-                // Difencia en minutos entre el turno y el horario de cierre
-                long minutos_entre_cierre = Duration.between(turno_actual.getHorario_fin(), dia_apertura.getHorario_fin()).toMinutes();
-                
-                // Ver si hay un espacio estre el turno y el horario de cierre
-                if (minutos_entre_cierre>0 & minutos_entre_cierre<configuracion_general.getDuracion_minima_turno()) {
-                    turnosDTO.add(new TurnoDTO(
-                        cancha.getId(),
-                        turno_actual.getFecha(),
-                        turno_actual.getHorario_fin(),
-                        dia_apertura.getHorario_fin()
-                    ));
+                // Verificar si el turno deseado se superpone con alguno existente
+                if (horaInicioDeseada.isBefore(finExistente) && horaFinDeseada.isAfter(inicioExistente)) {
+                    puedeReservar = false; // Si se superpone, no se puede reservar
+                    break;
                 }
             }
-        }
-        return turnosDTO;
-    }
 
-    public String dia_espaniol(LocalDate fecha){
-        // Dia de la semana del turno
-        DayOfWeek numero_dia_semana = fecha.getDayOfWeek();
-        String dia_de_semana="";
-        switch (numero_dia_semana) {
-            case MONDAY:
-                return dia_de_semana = "Lunes";
-            case TUESDAY:
-                return dia_de_semana = "Martes";
-            case WEDNESDAY:
-                return dia_de_semana = "Miércoles";
-            case THURSDAY:
-                return dia_de_semana = "Jueves";
-            case FRIDAY:
-                return dia_de_semana = "Viernes";
-            case SATURDAY:
-                return dia_de_semana = "Sábado";
-            case SUNDAY:
-                return dia_de_semana = "Domingo";
-            default:
-                return dia_de_semana;
+            // Si no hay superposición, añadir la cancha a la lista de canchas disponibles
+            if (puedeReservar) {
+                canchasDisponibles.add(cancha);
+            }
         }
-    }
+
+        return canchasDisponibles;
+    }  
 }

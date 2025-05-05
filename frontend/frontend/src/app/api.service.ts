@@ -10,15 +10,22 @@ export interface Reserva {
   horario_fin_ocupado: string;    // Hora de finalización
 }
 
+export interface Cancha{
+  id: number;
+  numero: number;
+  descripccion: string;
+  tipo: string;
+}
+
 interface VerificarUsuarioResponse {
   registrado: boolean;
 }
 
 export interface TurnoDTO {
   id_cancha: number;
-  fecha: string;
-  horario_inicio_ocupado: string;
-  horario_fin_ocupado: string;
+  fechaDeseada: string;
+  horario_deseado: string;
+  duracion: number;
 }
 
 export interface ReservaDTO {
@@ -130,8 +137,8 @@ export class ApiService {
     );
   }
 
-  getTurnos(): Observable<Reserva[]> {
-    return this.http.get<Reserva[]>(this.apiUrl + "public/consultar_turnos")
+  getCanchas(turnoDTO: TurnoDTO): Observable<Cancha[]> {
+    return this.http.post<Cancha[]>(this.apiUrl + "public/consultar_turnos", turnoDTO);
   }
 
   bloquearTurno(turnoDTO: TurnoDTO): Observable<any> {

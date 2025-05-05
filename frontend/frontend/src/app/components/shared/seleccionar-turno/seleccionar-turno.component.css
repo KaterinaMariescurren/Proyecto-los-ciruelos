@@ -1,0 +1,92 @@
+.form-row {
+  display: flex;
+  gap: 20px; /* Espacio entre campos */
+  align-items: center; /* Alineación vertical */
+  margin-bottom: 16px;
+}
+
+.no-canchas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.no-canchas-content {
+  width: 100%;
+}
+
+.no-canchas-title {
+  font-size: 18px;
+  margin: 0;
+}
+
+.no-canchas-subtitle {
+  font-size: 14px;
+  color: black;
+  margin-top: 8px;
+}
+
+.custom-field {
+  flex: 1; /* Hacer que ambos campos ocupen el mismo ancho */
+}
+
+.form-row-center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.half-width-field {
+  width: 50%;
+
+}
+
+.cancha-card {
+  background-color: var(--background-accent);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.card-header-custom {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.cancha-info {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.cancha-price {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: black;
+}
+
+.cancha-title {
+  flex: 1; /* Ocupa todo el espacio disponible */
+  font-size: 1.2em;
+}
+
+.cancha-content {
+  padding: 10px;
+  font-size: 1em;
+}
+
+.cancha-description p {
+  margin: 0;
+  padding: 5px 0;
+}
+
+.boton-centrado {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+

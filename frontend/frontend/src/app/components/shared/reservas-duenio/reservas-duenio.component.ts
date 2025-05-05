@@ -67,7 +67,6 @@ export class ReservasDuenioComponent {
   }
 
   ngOnInit() {
-    this.cargarRerservaciones();
     // Primero revisamos si ya tenemos la configuración almacenada
     this.configuracion = this.configuracionService.getStoredConfiguracion();
 
@@ -87,56 +86,11 @@ export class ReservasDuenioComponent {
       const startTime = this.selectedSlot ?? ""; // El horario de inicio es el slot donde el usuario hace click
       const endTime = this.getEndTime(startTime); // El horario de fin será 90 minutos después
 
-      const turnoDTO: TurnoDTO = {
-        id_cancha: this.selectedCourt?.id ?? 0, // Reemplaza con el ID de la cancha
-        fecha: selectedDate, // Fecha en formato adecuado
-        horario_inicio_ocupado: startTime ?? "", // Horario inicio en formato HH:mm
-        horario_fin_ocupado: endTime // Horario fin en formato HH:mm
-      };
 
-      // Bloquear el turno a través de la API
-      this.api.bloquearTurno(turnoDTO).subscribe({
-        next: (response) => {
-          // Si la respuesta es exitosa, redirige a la página de ticket
-          if (response?.message === "Se bloqueo el turno") {
-
-            this.router.navigate(['/reserva'], {
-              queryParams: {
-                id_cancha: turnoDTO.id_cancha,
-                fecha: turnoDTO.fecha,
-                horario_inicio_ocupado: turnoDTO.horario_inicio_ocupado,
-                horario_fin_ocupado: turnoDTO.horario_fin_ocupado,
-              }
-            });
-          }
-        },
-        error: (err) => {
-          // Si ocurre algún error en el bloqueo, muestra un mensaje de error
-          console.error('Error al bloquear el turno', err);
-          this.toastrService.error('Hubo un error al intentar bloquear el turno.', 'Error');
-        }
-      });
     } else {
       this.router.navigate(['/login']);
     }
-  }  
-
-  cargarRerservaciones() {
-    this.api.getTurnos().subscribe(
-      (turnos) => {
-        this.reservations = turnos.filter(turno => turno.fecha === this.selectedDate).map(turno => ({
-          id_cancha: turno.id_cancha,
-          horario_inicio_ocupado: turno.horario_inicio_ocupado,
-          horario_fin_ocupado: turno.horario_fin_ocupado,
-          fecha: turno.fecha
-        }));
-      },
-      (error) => {
-        console.error('Error al cargar los turnos', error);
-      }
-    );
-  }
-  
+  } 
 
   getMinDate(): string {
     const today = new Date();
@@ -149,7 +103,6 @@ export class ReservasDuenioComponent {
   onDateChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.selectedDate = input.value;
-    this.cargarRerservaciones(); // Volver a cargar las reservas del backend
     this.clearSelectedCells();
     this.hideOptionsMenu();
   }  

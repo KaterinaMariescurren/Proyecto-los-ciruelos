@@ -1,0 +1,97 @@
+<div class="form">
+  <div class="form__container">
+    <h1>Seleccionar Turno</h1>
+
+    <form [formGroup]="form" (ngSubmit)="verTurnosDisponibles()" novalidate>
+      
+      <!-- Fecha y Hora -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Fecha</mat-label>
+          <input matInput [matDatepicker]="picker" [min]="hoy" formControlName="fecha" readonly>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- Selección de horario en intervalos de 30 minutos -->
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Hora de Inicio</mat-label>
+          <mat-select formControlName="horaInicio">
+            <mat-option *ngFor="let hora of horarios" [value]="hora">
+              {{ hora }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Duración: solo visible si se completaron fecha y hora -->
+      <div class="form-row-center" *ngIf="form.get('fecha')?.valid && form.get('horaInicio')?.valid">
+        <mat-form-field appearance="outline" class="half-width-field">
+          <mat-label>Duración del Turno (minutos)</mat-label>
+          <mat-select formControlName="duracion">
+            <mat-option [value]="90">90</mat-option>
+            <mat-option [value]="120">120</mat-option>
+            <mat-option [value]="150">150</mat-option>
+            <mat-option [value]="180">180</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+
+      <!-- Botón para buscar: visible solo si todos los campos están completos -->
+      <div class="register-button"
+          *ngIf="form.get('fecha')?.valid && form.get('horaInicio')?.valid && form.get('duracion')?.valid">
+        <button mat-raised-button type="submit" class="submit-button">
+          Buscar Turnos
+        </button>
+      </div>
+    </form>
+
+    <!-- Resultados -->
+    <div *ngIf="canchas.length > 0" style="margin-top: 30px;">
+      <h2>Canchas Disponibles</h2>
+      <div class="canchas-grid">
+        <mat-card class="cancha-card" *ngFor="let cancha of canchas">
+          <mat-card-header>
+            <div class="card-header-custom">
+              <div class="cancha-info">
+                <strong>Cancha {{ cancha.numero }}</strong> - {{ cancha.tipo }}
+              </div>
+              <div class="cancha-price">
+                ${{ isSocio
+                  ? (configuracion?.monto_reserva ?? 0) -
+                    ((configuracion?.monto_reserva ?? 0) * (configuracion?.descuento_socio ?? 0))
+                  : (configuracion?.monto_reserva ?? 0)}}
+              </div>
+            </div>
+          </mat-card-header>          
+        
+          <mat-card-content class="cancha-content">
+            <div class="cancha-description">
+              <p>{{ cancha.descripccion }}</p>
+              <p class="cancha-price"><strong>Horario:</strong> {{ horaInicioSeleccionado }} - {{ horarioFinCalculado}}</p>
+            </div>
+          </mat-card-content>
+          <div class="boton-centrado">
+            <button mat-raised-button class="submit-button" (click)="onButtonClick(cancha.id)">
+              Reservar
+            </button>
+          </div>
+        </mat-card>        
+      </div>
+    </div>
+    <div *ngIf="busquedaRealizada && canchas.length === 0" style="margin-top: 30px;">
+      <h2>Canchas Disponibles</h2>
+      <div class="canchas-grid">
+        <mat-card class="cancha-card no-canchas">
+          <mat-card-content class="cancha-content no-canchas-content">
+            <div class="cancha-description">
+              <p class="no-canchas-title"><strong>No hay canchas disponibles</strong></p>
+              <p class="no-canchas-subtitle">Intenta con otra fecha, horario o duración.</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>    
+  </div>
+</div>

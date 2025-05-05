@@ -67,7 +67,6 @@ export class CalendarioReservaComponent implements OnInit {
   ngOnInit() {
     this.selectedDate = this.getCurrentDate();
     this.actualizarTimeSlotsDelDia(); 
-    this.cargarRerservaciones();
 
     // Primero revisamos si ya tenemos la configuración almacenada
     this.configuracion = this.configuracionService.getStoredConfiguracion();
@@ -96,22 +95,6 @@ export class CalendarioReservaComponent implements OnInit {
         });
       }
     });
-  }
-
-  cargarRerservaciones() {
-    this.api.getTurnos().subscribe(
-      (turnos) => {
-        this.reservations = turnos.filter(turno => turno.fecha === this.selectedDate).map(turno => ({
-          id_cancha: turno.id_cancha,
-          horario_inicio_ocupado: turno.horario_inicio_ocupado,
-          horario_fin_ocupado: turno.horario_fin_ocupado,
-          fecha: turno.fecha
-        }));
-      },
-      (error) => {
-        console.error('Error al cargar los turnos', error);
-      }
-    );
   }
 
   obtenerHorariosDisponibles(): string[] {
@@ -187,35 +170,7 @@ export class CalendarioReservaComponent implements OnInit {
       const startTime = this.selectedSlot ?? ""; // El horario de inicio es el slot donde el usuario hace click
       const endTime = this.getEndTime(startTime); // El horario de fin será 90 minutos después
 
-      const turnoDTO: TurnoDTO = {
-        id_cancha: this.selectedCourt?.id ?? 0, // Reemplaza con el ID de la cancha
-        fecha: selectedDate, // Fecha en formato adecuado
-        horario_inicio_ocupado: startTime ?? "", // Horario inicio en formato HH:mm
-        horario_fin_ocupado: endTime // Horario fin en formato HH:mm
-      };
-
-      // Bloquear el turno a través de la API
-      this.api.bloquearTurno(turnoDTO).subscribe({
-        next: (response) => {
-          // Si la respuesta es exitosa, redirige a la página de ticket
-          if (response?.message === "Se bloqueo el turno") {
-
-            this.router.navigate(['/reserva'], {
-              queryParams: {
-                id_cancha: turnoDTO.id_cancha,
-                fecha: turnoDTO.fecha,
-                horario_inicio_ocupado: turnoDTO.horario_inicio_ocupado,
-                horario_fin_ocupado: turnoDTO.horario_fin_ocupado,
-              }
-            });
-          }
-        },
-        error: (err) => {
-          // Si ocurre algún error en el bloqueo, muestra un mensaje de error
-          console.error('Error al bloquear el turno', err);
-          this.toastrService.error('Hubo un error al intentar bloquear el turno.', 'Error');
-        }
-      });
+    
     })
   }  
 
@@ -263,7 +218,6 @@ export class CalendarioReservaComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     this.selectedDate = input.value;
     this.actualizarTimeSlotsDelDia();
-    this.cargarRerservaciones(); // Volver a cargar las reservas del backend
     this.clearSelectedCells();
     this.hideOptionsMenu();
   }  
@@ -310,7 +264,6 @@ export class CalendarioReservaComponent implements OnInit {
             if (this.isReserved(court.id, this.timeSlotsDelDia[i])!=='red') {
               cantidad_celdas_sin_rojo=cantidad_celdas_sin_rojo+1;
               if((cantidad_celdas_sin_rojo==4)){
-                this.highlightedCells.push({ courtId: court.id, slot: this.timeSlotsDelDia[i] });
                 this.highlightedCells.push({ courtId: court.id, slot: this.timeSlotsDelDia[i-1] });
                 this.highlightedCells.push({ courtId: court.id, slot: this.timeSlotsDelDia[i-2] });
                 this.highlightedCells.push({ courtId: court.id, slot: this.timeSlotsDelDia[i-3] });
@@ -356,6 +309,15 @@ export class CalendarioReservaComponent implements OnInit {
     return false; // Si no hay conflictos, retornar false, es decir, no está bloqueada
   }   
 
+  get groupedHours(): string[] {
+    const uniqueHours = new Set<string>();
+    this.timeSlotsDelDia.forEach(slot => {
+      const [hour] = slot.split(":");
+      uniqueHours.add(hour + ":00");
+    });
+    return Array.from(uniqueHours);
+  }  
+
   getEndTime(startTime: string): string {
     const [hour, minute] = startTime.split(':').map(Number);
     let endHour = hour;
@@ -400,6 +362,62 @@ export class CalendarioReservaComponent implements OnInit {
     return false;
   }
 
+  isFirstPastTime(courtId: number, slot: string): boolean {
+    const index = this.timeSlotsDelDia.indexOf(slot);
+    if (!this.isPastTime(slot)) return false;
+  
+    // Si es la primera celda, y es pasada
+    if (index === 0) return true;
+  
+    // Si la anterior no es pasada, esta es la primera pasada
+    const previousSlot = this.timeSlotsDelDia[index - 1];
+    return !this.isPastTime(previousSlot);
+  }
+  
+  isLastPastTime(courtId: number, slot: string): boolean {
+    const index = this.timeSlotsDelDia.indexOf(slot);
+    if (!this.isPastTime(slot)) return false;
+  
+    // Si es la última celda, y es pasada
+    if (index === this.timeSlotsDelDia.length - 1) return true;
+  
+    // Si la siguiente no es pasada, esta es la última pasada
+    const nextSlot = this.timeSlotsDelDia[index + 1];
+    return !this.isPastTime(nextSlot);
+  }
+  
+  isFirstHighlight(courtId: number, slot: string): boolean {
+    const index = this.timeSlotsDelDia.indexOf(slot);
+    if (!this.isHighlighted(courtId, slot)) return false;
+    if (index === 0) return true;
+    const prev = this.timeSlotsDelDia[index - 1];
+    return !this.isHighlighted(courtId, prev);
+  }
+  
+  isLastHighlight(courtId: number, slot: string): boolean {
+    const index = this.timeSlotsDelDia.indexOf(slot);
+    if (!this.isHighlighted(courtId, slot)) return false;
+    if (index === this.timeSlotsDelDia.length - 1) return true;
+    const next = this.timeSlotsDelDia[index + 1];
+    return !this.isHighlighted(courtId, next);
+  }
+  
+  isFirstReserved(courtId: number, slot: string): boolean {
+    const index = this.timeSlotsDelDia.indexOf(slot);
+    if (this.isReserved(courtId, slot) !== 'red') return false;
+    if (index === 0) return true;
+    const prev = this.timeSlotsDelDia[index - 1];
+    return this.isReserved(courtId, prev) !== 'red';
+  }
+  
+  isLastReserved(courtId: number, slot: string): boolean {
+    const index = this.timeSlotsDelDia.indexOf(slot);
+    if (this.isReserved(courtId, slot) !== 'red') return false;
+    if (index === this.timeSlotsDelDia.length - 1) return true;
+    const next = this.timeSlotsDelDia[index + 1];
+    return this.isReserved(courtId, next) !== 'red';
+  }  
+
   // Función para convertir una hora en formato HH:mm a minutos desde las 00:00
   timeToMinutes(time: string): number {
     const [hours, minutes] = time.split(':').map(Number);
@@ -415,7 +433,7 @@ export class CalendarioReservaComponent implements OnInit {
         const endMinutes = this.timeToMinutes(reservation.horario_fin_ocupado);
         
         // Verificamos si el slot está dentro del rango de la reserva, incluyendo el final
-        if (slotMinutes >= startMinutes && slotMinutes <= endMinutes) {
+        if (slotMinutes >= startMinutes && slotMinutes < endMinutes) {
           const duration = endMinutes - startMinutes;
           if (duration >= 90) {
             return 'red'; // Solo devolver 'red' si la duración es de 90 minutos o más

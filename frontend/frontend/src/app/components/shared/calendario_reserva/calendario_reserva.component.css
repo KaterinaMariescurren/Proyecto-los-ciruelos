@@ -1,91 +1,139 @@
-/* Contenedor principal del calendario */
 .calendar-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 10px;
+  padding: 5px;
   background-color: var(--background-accent);
   border-radius: 15px;
-  box-shadow: 0 4px 10px black;
+  border: 2px solid black;
   font-family: "Roboto";
   width: 100%;
-  max-width: calc(100vw - 40px); /* 20px de espacio a la izquierda y derecha */
+  max-width: calc(100vw - 40px);
   height: 100%;
   overflow-x: auto;
   flex-wrap: wrap;
 }
 
-/* Celdas reservadas parcialmente (media celda) */
 .reserved-half {
   background: linear-gradient(to right, rgba(255, 0, 0, 0.6) 50%, transparent 50%);
   cursor: not-allowed;
   pointer-events: none;
 }
 
-/* Estilizar la tabla */
 .calendar-table {
   border-collapse: collapse;
   font-size: 14px;
   min-width: 600px;
-  table-layout: fixed; /* Asegura que las celdas no se desborden */
+  table-layout: fixed;
 }
 
-/* Encabezado de la tabla */
 .calendar-table thead th {
   font-size: 16px;
   white-space: nowrap;
   text-align: center;
 }
 
-/* Selector de fecha */
-.date-picker-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .date-picker {
-  width: 100%;
-  font-size: 12px;
-}
-
-/* Nombre de la cancha */
-.court-name {
+  padding: 5px 1px;
+  font-size: 15px;
   text-align: center;
-  background-color: var(--background-accent);
-  font-size: 16px;
+  border: 1px solid black;
+  border-radius: 8px;
+  color: white;
+  background-color: #4CAF50;
 }
 
-/* Estilizar celdas de tiempo */
+.date-picker:hover {
+  border-color: black;
+}
+
+.date-picker:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.court-card {
+  background-color: #4CAF50;
+  border: 1px solid black;
+  color: white;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  text-align: center;
+}
+
 .cell {
-  border-bottom: 2px solid var(--background-accent);
-  height: 50px;
-  width: 50px;
+  width: 25px;
+  height: 40px;
   padding-left: 2px;
   cursor: pointer;
   transition: var(--button-color-primary) 0.3s;
 }
 
-/* Celdas resaltadas */
+.time-cell-wrapper {
+  padding: 5px;
+}
+
+.time-cell-block {
+  display: flex;
+  border: 2px solid black;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.hour-name {
+  text-align: center;
+  padding: 5px 0;
+}
+
+.hour-box {
+  font-size: 15px;
+}
+
+.hour-wrapper {
+  background-color: #4CAF50;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  border: 1px solid black;
+}
+
 .highlight {
   background-color: var(--button-color-primary) !important;
 }
 
-/* Celdas de tiempo pasado */
 .past-time {
   background-color: var(--pass-time);
   pointer-events: none;
   cursor: not-allowed;
 }
 
-/* Celdas reservadas */
+.first-past,
+.first-highlight,
+.first-reserved {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.last-past,
+.last-highlight,
+.last-reserved {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
 .reserved {
   background-color: rgba(255, 0, 0, 0.6);
   cursor: not-allowed;
   pointer-events: none;
 }
 
-/* Menú de opciones */
 .options-menu {
   position: absolute;
   width: 200px;
@@ -97,7 +145,6 @@
   transition: all 0.3s ease;
 }
 
-/* Información dentro del menú */
 .info-box {
   font-size: 12px;
   color: #555;
@@ -105,7 +152,6 @@
   font-weight: 500;
 }
 
-/* Opciones dentro del menú */
 .option {
   padding: 8px;
   margin: 3px 0;
@@ -116,46 +162,61 @@
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-/* Media queries para pantallas más pequeñas */
-
-/* Pantallas de 1366px de ancho o menores */
-@media (max-width: 1366px) {
+@media (max-width: 768px) {
   .calendar-container {
-    max-width: calc(100vw - 40px); /* Mantener el margen de 20px a cada lado */
-    margin-right: 10px; /* Añadido margen derecho */
+    flex-direction: column;
+    align-items: flex-start;
+    overflow-x: auto;
+    padding: 10px 5px;
   }
 
   .calendar-table {
-    font-size: 12px; /* Reducimos el tamaño de la fuente */
+    font-size: 12px;
+    min-width: 500px; /* asegura scroll horizontal si es muy grande */
+    table-layout: auto;
+  }
+
+  .hour-wrapper {
+    flex-direction: column;
+    gap: 6px;
+    padding: 5px;
+  }
+
+  .hour-box {
+    font-size: 13px;
   }
 
   .cell {
-    width: 30px; /* Reducimos el tamaño de las celdas */
-    height: 50px; /* Ajustamos la altura */
+    min-width: 20px;
+    height: 32px;
   }
 
-  .court-name {
-    font-size: 14px; /* Reducimos el tamaño de los nombres de las canchas */
+  .court-card {
+    font-size: 13px;
+    padding: 4px;
+  }
+
+  .date-picker {
+    width: 100%;
+    font-size: 13px;
   }
 
   .options-menu {
-    width: 180px; /* Reducimos el tamaño del menú */
+    width: 90vw;
+    left: 5vw !important; /* para evitar que se salga de la pantalla */
+    top: auto !important;
+    bottom: 10px;
+    position: fixed;
+    z-index: 9999;
   }
 
-  .date-picker-wrapper {
-    font-size: 14px; /* Ajustamos el tamaño del selector de fechas */
+  .option {
+    font-size: 13px;
+    padding: 6px;
   }
 
-  .highlight {
-    font-size: 14px; /* Aseguramos que las celdas resaltadas no se vean muy grandes */
-  }
-
-  /* Reducir la altura de las celdas de tiempo, dado que hay menos espacio vertical */
-  .cell {
-    height: 45px; /* Menos espacio entre celdas */
-  }
-
-  .calendar-table thead th {
-    font-size: 14px; /* Reducimos el tamaño de las cabeceras */
+  .info-box {
+    font-size: 11px;
   }
 }
+

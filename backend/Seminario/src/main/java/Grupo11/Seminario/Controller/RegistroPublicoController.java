@@ -45,9 +45,9 @@ public class RegistroPublicoController {
 
         Turno turno = new Turno();
         turno.setCancha(reserva_service.buscar_cancha(turnoDTO.getId_cancha()));
-        turno.setFecha(turnoDTO.getFecha());
-        turno.setHorarioInicio(turnoDTO.getHorario_inicio_ocupado());
-        turno.setHorario_fin(turnoDTO.getHorario_fin_ocupado());
+        turno.setFecha(turnoDTO.getFechaDeseada());
+        turno.setHorarioInicio(turnoDTO.getHorario_deseado());
+        turno.setHorarioFin(turnoDTO.getHorario_deseado().plusMinutes(turnoDTO.getDuracion()));
         turno.setEstado(EstadoTurno.Bloqueado);
         turno.setHorarioBloqueo(LocalTime.now());
         turnoService.guardar_turno(turno);

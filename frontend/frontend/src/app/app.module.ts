@@ -22,6 +22,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { MatCardModule } from '@angular/material/card';
 
 
 // Components
@@ -59,6 +60,7 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { environment } from '../environments/environment';
 import { ReservasDuenioComponent } from './components/shared/reservas-duenio/reservas-duenio.component';
+import { SeleccionarTurnoComponent } from './components/shared/seleccionar-turno/seleccionar-turno.component';
 
 @NgModule({
   declarations: [
@@ -89,6 +91,7 @@ import { ReservasDuenioComponent } from './components/shared/reservas-duenio/res
     RegisterEmpleadoComponent,
     ConsultarEmpleadoComponent,
     ReservasDuenioComponent,
+    SeleccionarTurnoComponent,
 
   ],
   imports: [
@@ -119,6 +122,7 @@ import { ReservasDuenioComponent } from './components/shared/reservas-duenio/res
     }),
     FormsModule,
     AngularFireModule.initializeApp(environment.firebaseConfig), // Asegúrate de importar esto
+    MatCardModule,
   ],
   providers: [
     provideFirebaseApp(() => initializeApp({ "projectId": "proyecto-los-ciruelos", "appId": "1:458631280275:web:077d19f3d31ac919ca3f66", "storageBucket": "proyecto-los-ciruelos.appspot.com", "apiKey": "AIzaSyADexIDOi159hPk8yHrKvBrh8n8OeY5Cpo", "authDomain": "proyecto-los-ciruelos.firebaseapp.com", "messagingSenderId": "458631280275", "measurementId": "G-K0V8KZ571Q" })),
